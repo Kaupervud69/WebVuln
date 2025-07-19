@@ -173,13 +173,14 @@ ___________________________
 
 # Tools
 
-https://www.kali.org/tools/hydra/
-https://www.kali.org/tools/patator/
-FFUF
+- https://www.kali.org/tools/hydra/
+- https://www.kali.org/tools/patator/
+- FFUF
+
 ___________________________
 
 # URL
 
-https://portswigger.net/web-security/authentication
-https://www.passwordmonster.com/
-https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Authentication_Cheat_Sheet.md
+- https://portswigger.net/web-security/authentication
+- https://www.passwordmonster.com/
+- https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Authentication_Cheat_Sheet.md
