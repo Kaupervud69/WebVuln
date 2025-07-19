@@ -75,7 +75,7 @@ Not found. Это означает, что вы вышли за пределы �
     
     username=../../../../openapi.json%23 (swagger.json, openapi.yaml, api-docs.json, apidoc.json, schema.json, docs)
 
-## Структурированные форматы данных:
+# Структурированные форматы данных:
 
 POST /myaccount
 {"name": "peter\",\"access_level\":\"administrator"}
