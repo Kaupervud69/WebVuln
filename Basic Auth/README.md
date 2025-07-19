@@ -1,6 +1,6 @@
 # Auth
 
-* MFA
+* [MFA](MFA)
 * OTP
 * Basic auth
 
