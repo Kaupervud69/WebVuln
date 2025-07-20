@@ -4,7 +4,7 @@
 	*
 * [Основные уязвимости API](#Основные)
   	* [BOLA](#BOLA)
-	* [BA](##BA) 
+	* [BA](#BA) 
 	* [URC](#URC) 
 	* [BFLA](#BFLA) 
 	* [UASBF](#UASBF)
