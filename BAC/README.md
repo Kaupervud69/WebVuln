@@ -66,17 +66,15 @@
 
 > Некоторые фреймворки приложений поддерживают различные нестандартные заголовки HTTP, которые можно использовать для переопределения URL.
 
-       Nginx,Apache,Traefik:
-       X-Original-URL
-       Прокси,API-шлюзы:
-       X-Rewrite-URL
-       Кастомные Прокси:
-       X-Forwarded-Path
-```     
- Веб-серверы:
- X-Request-URI
-```
+|----------|----------:|
+|Nginx,Apache,Traefik|X-Original-URL|
+|Прокси,API-шлюзы|X-Rewrite-URL|
+|Кастомные Прокси|X-Forwarded-Path|
+|Веб-серверы|X-Request-URI|
 
+Nginx+Backend:
+
+X-original
 
 
 
