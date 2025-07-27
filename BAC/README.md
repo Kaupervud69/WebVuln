@@ -73,10 +73,11 @@
 |Кастомные Прокси|X-Forwarded-Path|
 |Веб-серверы|X-Request-URI|
 
-Nginx+Backend:
-
-X-original
-
+|Nginx+Backend||
+|:-----------:|:-------------:|
+|Полный исходный запрос(метод+URL)|X-Original-Request|
+|Внут.перенаправления|X-Accel-Redirect|
+|Аналог для отдачи файлов|X-Sendfile|
 
 
 
