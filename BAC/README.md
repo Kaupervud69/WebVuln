@@ -45,6 +45,7 @@
 
       https://insecure-website.com/admin
       https://insecure-website.com/robots.txt
+      Безопасность через неизвестность: https://insecure-website.com/administrator-panel-yb556 (может быть раскрыт в JavaScript)
       Можно использовать список слов для подбора местоположения конфиденциальной функциональности.
 
 
