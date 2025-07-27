@@ -72,16 +72,28 @@
 |Прокси,API-шлюзы|X-Rewrite-URL|
 |Кастомные Прокси|X-Forwarded-Path|
 |Веб-серверы|X-Request-URI|
+||X-Original-URL|
 
-|Nginx+Backend||
+|Nginx,Apache||
 |:-----------:|:-------------:|
-|Полный исходный запрос(метод+URL)|X-Original-Request|
-|Внут.перенаправления|X-Accel-Redirect|
-|Аналог для отдачи файлов|X-Sendfile|
+|Подмена пути|X-Rewritten-URL|
+|Возможный SSRF|X-Accel-Redirect|
+|Возможный SSRF|X-Sendfile|
 
+|Cloudflare||
+|:-------------:|:--------------:|
+|Если CDN доверяет заголовку|CF-Original-URL|
+|Обход IP фильтров|True-Client-IP|
 
+|Node.js||
+|:-------------:|:--------------:|
+||X-Original-Path|
+|Подмена пути API|X-Forwarded-Uri|
 
-
+|PHP||
+|:-------------:|:--------------:|
+||X-Original-Path-info|
+|WordPress|X-Rewrite-Original|
 
 
 # **Профит**
