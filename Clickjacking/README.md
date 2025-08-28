@@ -174,11 +174,13 @@ src="https://victim.net/feedback?name=<img src=1 onerror=confirm('Mzfka?')>&emai
     * **object-src**: Определяет источники для объектов, таких как плагины и встроенные контенты (например, <object>, <embed>, <applet>).
     * Пример: Content-Security-Policy: object-src 'none'
 
+
 * **Директивы для управления соединениями и ресурсами:**
     * **connect-src**: Определяет, к каким урлам можно отправлять запросы (например, через fetch, XHR, WebSocket).
     * Пример: Content-Security-Policy: connect-src 'self' Ссылка скрыта от гостей
     * **frame-src**: Определяет источники, из которых можно загружать фреймы (<iframe>).
     * Пример: Content-Security-Policy: frame-src 'self' Ссылка скрыта от гостей
+
 
 * **Другие важные директивы:**
     * **default-src**: Определяет "базовый" источник для всех типов ресурсов, если не указаны более конкретные директивы.
