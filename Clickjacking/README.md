@@ -152,45 +152,22 @@ src="https://victim.net/feedback?name=<img src=1 onerror=confirm('Mzfka?')>&emai
 
 # **Основные директивы CSP**
 
-* **Директивы для контроля скриптов:**
-    * **script-src**: Определяет, откуда можно загружать и выполнять JavaScript.
-    * Пример: Content-Security-Policy: script-src 'self' Ссылка скрыта от гостей
-    * **unsafe-inline**: Разрешает выполнение инлайновых скриптов (не рекомендуется, так как увеличивает риск XSS).
-    * unsafe-eval: Разрешает использование eval() и аналогичных функций, что также увеличивает риск.
-
-* **Директивы для контроля стилей:**
-    * **style-src**: Определяет источники для CSS стилей.
-    * Пример: Content-Security-Policy: style-src 'self' Ссылка скрыта от гостей
-
-* **Директивы для контроля медиа-ресурсов:**
-    * **img-src**: Определяет источники для изображения
-    * Пример: Content-Security-Policy: img-src 'self' Ссылка скрыта от гостей
-    * **media-src**: Определяет источники для аудио и видео файлов.
-    * Пример: Content-Security-Policy: media-src 'self' Ссылка скрыта от гостей
-
-* **Директивы для шрифтов и других ресурсов:**
-    * **font-src**: Определяет источники для веб-шрифтов.
-    * Пример: Content-Security-Policy: font-src 'self' Ссылка скрыта от гостей
-    * **object-src**: Определяет источники для объектов, таких как плагины и встроенные контенты (например, <object>, <embed>, <applet>).
-    * Пример: Content-Security-Policy: object-src 'none'
-
-
-* **Директивы для управления соединениями и ресурсами:**
-    * **connect-src**: Определяет, к каким урлам можно отправлять запросы (например, через fetch, XHR, WebSocket).
-    * Пример: Content-Security-Policy: connect-src 'self' Ссылка скрыта от гостей
-    * **frame-src**: Определяет источники, из которых можно загружать фреймы (<iframe>).
-    * Пример: Content-Security-Policy: frame-src 'self' Ссылка скрыта от гостей
-
-
-* **Другие важные директивы:**
-    * **default-src**: Определяет "базовый" источник для всех типов ресурсов, если не указаны более конкретные директивы.
-    * Пример: Content-Security-Policy: default-src 'self'
-    * **report-uri**: Указывает урл для отправки отчетов о нарушениях CSP.
-    * Пример: Content-Security-Policy: report-uri /csp-violation-report-endpoint/
-    * **upgrade-insecure-requests**: Принудительно преобразует все незащищенные запросы (HTTP) в защищенные (HTTPS).
-    * Пример: Content-Security-Policy: upgrade-insecure-requests
-
-
+|Директива|Пример|Описание|
+|--------------|-------------------|---------------|
+|script-src|Content-Security-Policy: script-src 'self'|Определяет, откуда можно загружать и выполнять JavaScript|
+|unsafe-inline|| Разрешает выполнение инлайновых скриптов (не рекомендуется, так как увеличивает риск XSS)|
+|unsafe-eval||Разрешает использование eval() и аналогичных функций, что также увеличивает риск|
+|style-src| Content-Security-Policy: style-src 'self'|Определяет источники для CSS стилей|
+|img-src|Content-Security-Policy: img-src 'self'|Определяет источники для изображения|
+|media-src|Content-Security-Policy: media-src 'self'|Определяет источники для аудио и видео файлов|
+|font-src|Content-Security-Policy: font-src 'self'|Определяет источники для веб-шрифтов|
+|object-src|Content-Security-Policy: object-src 'none'|Определяет источники для объектов, таких как плагины и встроенные контенты (например, <object>, <embed>, <applet>)|
+|connect-src|Content-Security-Policy: connect-src 'self'|Определяет, к каким урлам можно отправлять запросы (например, через fetch, XHR, WebSocket)|
+|frame-src|Content-Security-Policy: frame-src 'self'|Определяет источники, из которых можно загружать фреймы (<iframe>)|
+|default-src|Content-Security-Policy: default-src 'self'|Определяет "базовый" источник для всех типов ресурсов, если не указаны более конкретные директивы|
+|report-uri|Content-Security-Policy: report-uri /csp-violation-report-endpoint/|Указывает урл для отправки отчетов о нарушениях CSP|
+|upgrade-insecure-requests|Content-Security-Policy: upgrade-insecure-requests|Принудительно преобразует все незащищенные запросы (HTTP) в защищенные (HTTPS)|
+ 
 # URL
 * https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP
 * https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy#directives
