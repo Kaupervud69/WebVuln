@@ -204,7 +204,7 @@ wh``oami
 w\ho\am\i
 /\b\i\n/////s\h
 ```
-### $@,U+FF04 0 и $()
+### $@/$0/$()
 ```
 who$@ami
 echo whoami|$0
