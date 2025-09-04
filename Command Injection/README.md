@@ -243,6 +243,7 @@ nohup sleep 120 > /dev/null &
 * https://portswigger.net/research/hunting-asynchronous-vulnerabilities
 * https://github.com/carlospolop/Auto_Wordlists/blob/main/wordlists/command_injection.txt - wordlist
 * https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Command%20Injection#methodology
+* https://book.hacktricks.wiki/en/pentesting-web/command-injection.html
 
 # Tools
 * https://github.com/commixproject/commix
