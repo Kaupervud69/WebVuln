@@ -126,6 +126,7 @@ product?productId=1&storeId=London%27><script>alert("XXX")</script>
 * **Библиотека jQuery**
 > функция attr() - может изменять атрибуты элементов DOM.
 ```
+//Изменяет атрибут href элемента привязки, используя данные из URL-адреса
 $(function() {
 $('#backLink').attr("href",(new URLSearchParams(window.location.search)).get('returnUrl'));
 });
@@ -229,4 +230,4 @@ html.replace('<', '&lt;').replace('>', '&gt;');
 | **jQuery манипуляции** | | | 
 | `add()` | Метод | Добавляет элементы (риск через обработчики) |
 
-[URL validation bypass cheat sheet](#https://portswigger.net/web-security/ssrf/url-validation-bypass-cheat-sheet)
+[URL validation bypass cheat sheet](https://portswigger.net/web-security/ssrf/url-validation-bypass-cheat-sheet)
