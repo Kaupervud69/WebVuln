@@ -638,3 +638,8 @@ console.log(person.attributes); // "I'm a string now!" - нативный гет
 
 * Разработчики JavaScript часто используют следующий шаблон:
     * var someObject = window.someObject || {};
+```
+Логика:
+Если window.someObject уже существует — используем его
+Иначе создаем пустой объект {}
+```
