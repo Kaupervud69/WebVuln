@@ -225,7 +225,7 @@ xhr.onreadystatechange = function() {
 /search-results?search=\"alert(1)}//
 ```
 * При XSS в DOM сервер получает данные из одного запроса, сохраняет их, а затем включает в следующий ответ. Скрипт в ответе содержит приёмник, который затем обрабатывает данные небезопасным способом.
-``` element.innerHTML = comment.author```
+```element.innerHTML = comment.author```
 > Без флага g метод replace() заменяет только первое совпадение.
 ```
 html.replace('<', '&lt;').replace('>', '&gt;');
