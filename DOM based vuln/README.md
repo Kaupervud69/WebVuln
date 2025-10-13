@@ -24,7 +24,7 @@
 * [Отказ в обслуживании на основе DOM](#Отказ-в-обслуживании-на-основе-DOM)
 * [DOM-clobbering](#DOM-clobbering)
     * [Массивы и атрибуты](#Массивы-и-атрибуты)
-    * [window.someObject](#window.someObject)
+    * [window.someObject](#windowsomeObject)
 * [Защита](#Защита)
 * [URL](#URL)
 
