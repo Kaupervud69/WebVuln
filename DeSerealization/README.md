@@ -6,6 +6,22 @@
 > Небезопасная десериализация — это ситуация, когда сайт десериализует данные, которые контролирует пользователь.
 >> Чаще всего уязвимость десериализации связана с BAC. Она позволяет хакерам получить несанкционированный доступ к аккаунтам админов и других пользователей. Это как матрёшка: одна уязвимость открывает другую.
 
+* **В некоторых языках программирования сериализацию называют иначе из-за названия библиотек** 
+	* Ruby - Marshal
+	* Python — pickle.
+
+| Язык | Стандартная / Основная библиотека (родной формат) | Основные библиотеки для межъязыковых форматов |
+| :--- | :--- | :--- |
+| **Python** | `pickle` | `json`, `pyyaml` (YAML), `xml.etree` |
+| **Ruby** | `Marshal` | `json` (гем), `psych` (YAML) |
+| **Java** | `java.io.Serializable` | `Jackson` (JSON/XML/YAML), `Gson` (JSON) |
+| **C#** | `BinaryFormatter` | `Newtonsoft.Json`, `System.Text.Json` (JSON) |
+| **JavaScript** | `JSON` (родной) | `JSON` (де-факто стандарт) |
+| **Go** | `encoding/gob` | `encoding/json`, `encoding/xml` |
+| **PHP** | `serialize()`/`unserialize()` | `json_encode()`/`json_decode()` |
+| **Swift** | `Codable` протокол | `JSONEncoder`/`JSONDecoder`, `PropertyListEncoder`/`PropertyListDecoder` |
+| **Kotlin** | `java.io.Serializable` | `kotlinx.serialization`, `Jackson`, `Gson` | 
+
 # Детекция десериализации по языкам программирования
 
 ## PHP
