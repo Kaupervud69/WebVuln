@@ -175,7 +175,7 @@ $ java -cp marshalsec.jar marshalsec.jndi.LDAPRefServer http://localhost:8000\#e
 
 Любой из следующих вариантов:
 
-`Validation failed: Unhandled Java exception: com.fasterxml.jackson.databind.exc.MismatchedInputException: Unexpected token (START_OBJECT), expected START_ARRAY: need JSON Array to contain As.WRAPPER_ARRAY type information for class java.lang.Object`
+``Validation failed: Unhandled Java exception: com.fasterxml.jackson.databind.exc.MismatchedInputException: Unexpected token (START_OBJECT), expected START_ARRAY: need JSON Array to contain As.WRAPPER_ARRAY type information for class java.lang.Object``
   * com.fasterxml.jackson.databind
   * org.codehaus.jackson.map
 
