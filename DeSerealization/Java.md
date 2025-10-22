@@ -5,7 +5,7 @@
   * [Альтернативные инструменты](#Альтернативные-инструменты)
 * [Десериализация YAML](#Десериализация-YAML)
 * [ViewState](#ViewState)
-* [Ссылки](#Ссылки)
+* [Ссылки](#URL)
 
 # Десериализация Java
 
@@ -247,25 +247,46 @@ CVE-2020-9548
 |base64 | rO0 |
 |base64 + gzip |H4sIAAA|
 
-* **Хранилище**
+**Хранилище**
 
-javax.faces.STATE_SAVING_METHOD — это параметр конфигурации в JavaServer Faces (JSF). Он определяет, как фреймворк должен сохранять состояние дерева компонентов (структуру и данные компонентов пользовательского интерфейса на странице) между HTTP-запросами.
+> javax.faces.STATE_SAVING_METHOD — это параметр конфигурации в JavaServer Faces (JSF). Он определяет, как фреймворк должен сохранять состояние дерева компонентов (структуру и данные компонентов пользовательского интерфейса на странице) между HTTP-запросами.
 
 Метод хранения также можно определить из представления viewstate в теле HTML.
 
-Хранилище на стороне сервера: value="-XXX:-XXXX"
-Хранилище на стороне клиента: base64 + gzip + Java Object
+* Хранилище на стороне сервера: ```value="-XXX:-XXXX"```
+* Хранилище на стороне клиента: ```base64 + gzip + Java Object```
 
-Шифрование
+**Шифрование**
 
 По умолчанию MyFaces использует DES в качестве алгоритма шифрования и HMAC-SHA1 для аутентификации ViewState. Рекомендуется и возможно использовать более современные алгоритмы, такие как AES и HMAC-SHA256.
-Алгоритм шифрования: HMAC
-DES ECB (по умолчанию) HMAC-SHA1
+|Алгоритм шифрования| HMAC|
+|----|----|
+|DES ECB (по умолчанию)| HMAC-SHA1|
 
 Поддерживаемые методы шифрования: BlowFish, 3DES, AES, определяются параметром контекста. Значения этих параметров и их секретные ключи можно найти внутри XML-выражений.
 
+```
 <param-name>org.apache.myfaces.MAC_ALGORITHM</param-name>
 <param-name>org.apache.myfaces.SECRET</param-name>
 <param-name>org.apache.myfaces.MAC_SECRET</param-name>
+```
 
-Распространённые секреты из документации.
+Распространённые секреты из [документации](https://cwiki.apache.org/confluence/display/MYFACES2/Secure+Your+Application).
+
+| Алгоритм            | Значение                          |
+|-------------------|---------------------------------|
+| AES CBC/PKCS5Padding | NzY1NDMyMTA3NjU0MzIxMA==       |
+| DES               | NzY1NDMyMTA=                    |
+| DESede            | MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIz |
+| Blowfish          | NzY1NDMyMTA3NjU0MzIxMA          |
+| AES CBC           | MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIz |
+| AES CBC IV        | NzY1NDMyMTA3NjU0MzIxMA==        |
+
+* Encryption: Data -> encrypt -> hmac_sha1_sign -> b64_encode -> url_encode -> ViewState
+* Decryption: ViewState -> url_decode -> b64_decode -> hmac_sha1_unsign -> decrypt -> Data
+
+
+# URL
+
+* [Java-Deserialization-Cheat-Sheet](https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet/blob/master/README.md)
+* https://www.gosecure.net/blog/2017/03/22/detecting-deserialization-bugs-with-dns-exfiltration/
