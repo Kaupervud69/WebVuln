@@ -265,7 +265,7 @@ O:4:"user":2:{s:8:"username";s:5:"amigo";s:14:"image_location";s:11:"/etc/passwd
 
 * Существует несколько доступных инструментов:
 	* [Java](https://github.com/Kaupervud69/WebVuln/blob/main/DeSerealization/Java.md#%D0%98%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D1%8B)
- 	* [PHP]()
+ 	* [PHP](https://github.com/Kaupervud69/WebVuln/blob/main/DeSerealization/PHP.md#%D0%98%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D1%8B)
 
 # **Точки входа**
   
