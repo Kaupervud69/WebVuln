@@ -1,0 +1,17 @@
+BSD-files.txt
+JHADDIX_LFI.txt
+LFI-FD-check.txt
+LFI-WindowsFileCheck.txt
+Linux-files.txt
+List_Of_File_To_Include.txt
+List_Of_File_To_Include_NullByteAdded.txt
+Mac-files.txt
+Traversal.txt
+Web-files.txt
+Windows-files.txt
+dot-slash-PathTraversal_and_LFI_pairing.txt
+php-filter-iconv.txt
+simple-check.txt
+LFI-to-RCE.md
+README.md
+Wrappers.md
