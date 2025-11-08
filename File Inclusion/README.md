@@ -39,7 +39,7 @@ include($file);
 
 В следующих примерах включаем файл /etc/passwd, проверь главу [Directory & Path Traversal](https://github.com/Kaupervud69/WebVuln/blob/main/Path%20traversal/README.md) для более интересных файлов.
 
-```
+```php
 http://example.com/index.php?page=../../../etc/passwd
 ```
 
