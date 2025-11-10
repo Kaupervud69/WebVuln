@@ -17,7 +17,7 @@
 * [LFI в RCE через PHP сессии](#LFI-в-RCE-через-PHP-сессии)
 * [LFI в RCE через PHP PEARCMD](#LFI-в-RCE-через-PHP-PEARCMD)
 * [LFI в RCE через файлы учетных данных](#LFI-в-RCE-через-файлы-учетных-данных)
-# [URL](#URL)
+* [URL](#URL)
 
 # LFI в RCE через /proc/*/fd
 
