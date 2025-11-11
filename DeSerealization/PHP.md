@@ -17,7 +17,7 @@
 ```__destruct()``` при удалении объекта. 
 ```__toString()``` при преобразовании объекта в строку.
 
-Также следует проверить ```wrapper Phar://``` в [File Inclusion](!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!), которая использует внедрение PHP-объекта.
+Также следует проверить ```wrapper Phar://``` в [File Inclusion](https://github.com/Kaupervud69/WebVuln/blob/main/File%20Inclusion/Wrappers.md#Wrapper-phar), которая использует внедрение PHP-объекта.
 
 Уязвимый код:
 
@@ -174,7 +174,7 @@ echo $cookie;
 
 # Десериализация Phar
 
-Используя обёртку phar://, можно запустить десериализацию указанного файла, например, file_get_contents("phar://./archives/app.phar").
+Используя обёртку [phar://](https://github.com/Kaupervud69/WebVuln/blob/main/File%20Inclusion/Wrappers.md#Wrapper-phar), можно запустить десериализацию указанного файла, например, ```file_get_contents("phar://./archives/app.phar")```.
 
 Корректный PHAR-файл включает четыре элемента:
 
