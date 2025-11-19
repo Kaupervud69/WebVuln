@@ -218,7 +218,7 @@ __schema{queryType{name},mutationType{name},types{kind,name,description,fields(i
 }
 ```
 ### Список путей для достижения типа
-```bash
+```python
 $ git clone https://gitlab.com/dee-see/graphql-path-enum
 $ graphql-path-enum -i ./test_data/h1_introspection.json -t Skill
 Found 27 ways to reach the "Skill" node from the "Query" node:
