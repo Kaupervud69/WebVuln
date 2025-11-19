@@ -199,7 +199,7 @@ __schema{queryType{name},mutationType{name},types{kind,name,description,fields(i
 ### Перечисление определений типов
 
 Перечислите определение интересующих типов, используя следующий запрос GraphQL, заменив "User" на выбранный тип.
-```
+```graphql
 {
   __type(name: "User") {
     name
