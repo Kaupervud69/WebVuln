@@ -47,9 +47,18 @@
 
 > Все операции GraphQL используют одну и ту же конечную точку (endpoint) и обычно отправляются как POST-запрос. Это существенно отличается от REST API, которые используют специфичные для операции конечные точки и различные HTTP-методы. В GraphQL тип и имя операции определяют, как обрабатывается запрос, а не конечная точка, на которую он отправлен, или используемый HTTP-метод.
 
-Данные, описываемые схемой GraphQL, можно манипулировать с помощью трех типов операций:
+**Данные, описываемые схемой GraphQL, можно манипулировать с помощью трех типов операций:**
 
-# GraphQL Операции и Примеры
+* **Запросы (Queries)** получают данные.(аналог GET в REST API)
+* **Мутации (Mutations)** добавляют, изменяют или удаляют данные.(POST,PUT и DELETE в REST API)
+   * Поля (Fields)
+   * Аргументы — это значения, предоставляемые для конкретных полей. Аргументы, которые может принимать тип, определяются в схеме.
+   * Переменные (Variables) - позволяют передавать динамические аргументы, вместо того чтобы указывать аргументы непосредственно в самом запросе.
+   * Псевдонимы (Aliases)
+   * Фрагменты (Fragments) — это переиспользуемые части запросов или мутаций. Они содержат подмножество полей, принадлежащих связанному типу. 
+* **Подписки (Subscriptions)** похожи на запросы, но устанавливают постоянное соединение, через которое сервер может активно передавать данные клиенту в указанном формате.(Websocket)
+
+* **GraphQL Операции и Примеры**
 
 | Тип операции | Назначение | Пример запроса | Пример переменных | Ответ сервера |
 |--------------|------------|----------------|-------------------|---------------|
@@ -57,12 +66,47 @@
 | **Query с аргументами** | Получение данных с фильтрацией | `query GetUsers($limit: Int!) { users(limit: $limit) { id name } }` | `{ "limit": 5 }` | `{ "data": { "users": [{ "id": "1", "name": "Alice" }] } }` |
 | **Query с псевдонимами** | Переименование полей в ответе | `query { author: user(id: "1") { fullName: name } admin: user(id: "2") { fullName: name } }` | `{}` | `{ "data": { "author": { "fullName": "Alice" }, "admin": { "fullName": "Bob" } } }` |
 | **Query с фрагментами** | Переиспользуемые наборы полей | `query { user1: user(id: "1") { ...UserFields } user2: user(id: "2") { ...UserFields } } fragment UserFields on User { name email createdAt }` | `{}` | `{ "data": { "user1": { "name": "Alice", "email": "alice@example.com", "createdAt": "2023-01-01" }, "user2": { "name": "Bob", "email": "bob@example.com", "createdAt": "2023-01-02" } } }` |
+| **Query с переменными** | Динамические параметры запроса | `query GetUserWithPosts($userId: ID!, $includePosts: Boolean!) { user(id: $userId) { name email posts @include(if: $includePosts) { title } } }` | `{ "userId": "1", "includePosts": true }` | `{ "data": { "user": { "name": "Alice", "email": "alice@example.com", "posts": [{ "title": "My Post" }] } } }` |
+| **Query с директивой @include** | Условное включение полей | `query User($id: ID!, $withPosts: Boolean!) { user(id: $id) { name email posts @include(if: $withPosts) { title } } }` | `{ "id": "1", "withPosts": false }` | `{ "data": { "user": { "name": "Alice", "email": "alice@example.com" } } }` |
+| **Query с директивой @skip** | Условное пропуск полей | `query User($id: ID!, $skipEmail: Boolean!) { user(id: $id) { name email @skip(if: $skipEmail) } }` | `{ "id": "1", "skipEmail": true }` | `{ "data": { "user": { "name": "Alice" } } }` |
 | **Mutation** | Создание данных (аналог POST) | `mutation CreateUser($input: UserInput!) { createUser(input: $input) { id name email } }` | `{ "input": { "name": "Charlie", "email": "charlie@example.com" } }` | `{ "data": { "createUser": { "id": "3", "name": "Charlie", "email": "charlie@example.com" } } }` |
 | **Mutation** | Обновление данных (аналог PUT) | `mutation UpdateUser($id: ID!, $input: UserInput!) { updateUser(id: $id, input: $input) { id name email } }` | `{ "id": "1", "input": { "name": "Alice Smith" } }` | `{ "data": { "updateUser": { "id": "1", "name": "Alice Smith", "email": "alice@example.com" } } }` |
 | **Mutation** | Удаление данных (аналог DELETE) | `mutation DeleteUser($id: ID!) { deleteUser(id: $id) { success message } }` | `{ "id": "1" }` | `{ "data": { "deleteUser": { "success": true, "message": "User deleted" } } }` |
+| **Mutation с несколькими операциями** | Атомарные изменения | `mutation UpdateProfile($userInput: UserInput!, $profileInput: ProfileInput!) { updateUser(input: $userInput) { name } updateProfile(input: $profileInput) { bio } }` | `{ "userInput": { "name": "Alice" }, "profileInput": { "bio": "Developer" } }` | `{ "data": { "updateUser": { "name": "Alice" }, "updateProfile": { "bio": "Developer" } } }` |
 | **Subscription** | Реальное время (WebSocket) | `subscription OnNewMessage { newMessage { id content author { name } } }` | `{}` | Постоянный поток данных при новых сообщениях |
+| **Subscription с переменными** | Фильтрация событий | `subscription OnUserMessages($userId: ID!) { newMessage(userId: $userId) { id content } }` | `{ "userId": "1" }` | Поток данных только для указанного пользователя |
+| **Inline Fragment** | Условные поля для интерфейсов | `query Search($query: String!) { search(query: $query) { ... on User { name email } ... on Post { title content } } }` | `{ "query": "Alice" }` | `{ "data": { "search": [{ "name": "Alice", "email": "alice@example.com" }] } }` |
 
-> Интроспекция(Introspection) — это встроенная функция GraphQL, которая позволяет запрашивать у сервера информацию о схеме. Она обычно используется такими приложениями, как GraphQL IDE и инструменты генерации документации.
+* **GraphQL Директивы**
+
+| Директива | Назначение | Пример | Результат |
+|-----------|------------|--------|-----------|
+| **@include** | Включить поле если условие true | `{ user { name email @include(if: $withEmail) } }` | Если `$withEmail = true` - вернет name и email, если `false` - только name |
+| **@skip** | Пропустить поле если условие true | `{ user { name email @skip(if: $withoutEmail) } }` | Если `$withoutEmail = true` - вернет только name, если `false` - name и email |
+| **@deprecated** | Помечает поле как устаревшее | `{ user { oldField @deprecated(reason: "Use newField") } }` | Используется в схеме, предупреждает клиентов |
+
+* **GraphQL Типы данных**
+
+| Тип | Пример | Описание |
+|-----|--------|-----------|
+| **Scalar Types** | | Базовые типы данных |
+| `String` | `"Hello"` | Текстовая строка |
+| `Int` | `42` | Целое число |
+| `Float` | `3.14` | Число с плавающей точкой |
+| `Boolean` | `true` | Логическое значение |
+| `ID` | `"user_123"` | Уникальный идентификатор |
+| **Input Types** | | Типы для входных данных |
+| `input UserInput` | `{ name: "Alice", email: "alice@example.com" }` | Сложный тип для мутаций |
+| **Object Types** | | Типы для возвращаемых данных |
+| `type User` | `{ id: "1", name: "Alice" }` | Объект с полями |
+| **Enum Types** | | Перечисляемые значения |
+| `enum Role` | `ADMIN, USER, GUEST` | Фиксированный набор значений |
+| **List Types** | | Массивы значений |
+| `[String]` | `["a", "b", "c"]` | Список строк |
+| **NonNull Types** | | Обязательные поля |
+| `String!` | Обязательная строка | Не может быть null |
+
+> **Интроспекция(Introspection)** — это встроенная функция GraphQL, которая позволяет запрашивать у сервера информацию о схеме. Она обычно используется такими приложениями, как GraphQL IDE и инструменты генерации документации.
 
 | Назначение | Запрос | Описание | Пример ответа |
 |------------|--------|----------|---------------|
