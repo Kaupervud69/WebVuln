@@ -27,7 +27,7 @@
     * [SQL Injection](#SQLi)
 
 # Инструменты
-
+*   [graphql wordlists](https://github.com/Escape-Technologies/graphql-wordlist/tree/main/wordlists)
 *   [swisskyrepo/GraphQLmap](https://github.com/swisskyrepo/GraphQLmap) - Скриптовый движок для взаимодействия с graphql endpoint в целях тестирования на проникновение.
 *   [doyensec/graph-ql](https://github.com/doyensec/graph-ql) - Материалы для исследования безопасности GraphQL.
 *   [doyensec/inql](https://github.com/doyensec/inql) - Расширение Burp для тестирования безопасности GraphQL.
@@ -49,16 +49,33 @@
 
 Данные, описываемые схемой GraphQL, можно манипулировать с помощью трех типов операций:
 
-* **Запросы (Queries)** получают данные.(аналог GET в REST API)
-* **Мутации (Mutations)** добавляют, изменяют или удаляют данные.(POST,PUT и DELETE в REST API)
-   * Поля (Fields)
-   * Аргументы — это значения, предоставляемые для конкретных полей. Аргументы, которые может принимать тип, определяются в схеме.
-   * Переменные (Variables) - позволяют передавать динамические аргументы, вместо того чтобы указывать аргументы непосредственно в самом запросе.
-   * Псевдонимы (Aliases)
-   * Фрагменты (Fragments) — это переиспользуемые части запросов или мутаций. Они содержат подмножество полей, принадлежащих связанному типу. 
-* **Подписки (Subscriptions)** похожи на запросы, но устанавливают постоянное соединение, через которое сервер может активно передавать данные клиенту в указанном формате.(Websocket)
+# GraphQL Операции и Примеры
+
+| Тип операции | Назначение | Пример запроса | Пример переменных | Ответ сервера |
+|--------------|------------|----------------|-------------------|---------------|
+| **Query** | Получение данных (аналог GET) | `query GetUser { user(id: "1") { name email } }` | `{}` | `{ "data": { "user": { "name": "Alice", "email": "alice@example.com" } } }` |
+| **Query с аргументами** | Получение данных с фильтрацией | `query GetUsers($limit: Int!) { users(limit: $limit) { id name } }` | `{ "limit": 5 }` | `{ "data": { "users": [{ "id": "1", "name": "Alice" }] } }` |
+| **Query с псевдонимами** | Переименование полей в ответе | `query { author: user(id: "1") { fullName: name } admin: user(id: "2") { fullName: name } }` | `{}` | `{ "data": { "author": { "fullName": "Alice" }, "admin": { "fullName": "Bob" } } }` |
+| **Query с фрагментами** | Переиспользуемые наборы полей | `query { user1: user(id: "1") { ...UserFields } user2: user(id: "2") { ...UserFields } } fragment UserFields on User { name email createdAt }` | `{}` | `{ "data": { "user1": { "name": "Alice", "email": "alice@example.com", "createdAt": "2023-01-01" }, "user2": { "name": "Bob", "email": "bob@example.com", "createdAt": "2023-01-02" } } }` |
+| **Mutation** | Создание данных (аналог POST) | `mutation CreateUser($input: UserInput!) { createUser(input: $input) { id name email } }` | `{ "input": { "name": "Charlie", "email": "charlie@example.com" } }` | `{ "data": { "createUser": { "id": "3", "name": "Charlie", "email": "charlie@example.com" } } }` |
+| **Mutation** | Обновление данных (аналог PUT) | `mutation UpdateUser($id: ID!, $input: UserInput!) { updateUser(id: $id, input: $input) { id name email } }` | `{ "id": "1", "input": { "name": "Alice Smith" } }` | `{ "data": { "updateUser": { "id": "1", "name": "Alice Smith", "email": "alice@example.com" } } }` |
+| **Mutation** | Удаление данных (аналог DELETE) | `mutation DeleteUser($id: ID!) { deleteUser(id: $id) { success message } }` | `{ "id": "1" }` | `{ "data": { "deleteUser": { "success": true, "message": "User deleted" } } }` |
+| **Subscription** | Реальное время (WebSocket) | `subscription OnNewMessage { newMessage { id content author { name } } }` | `{}` | Постоянный поток данных при новых сообщениях |
 
 > Интроспекция(Introspection) — это встроенная функция GraphQL, которая позволяет запрашивать у сервера информацию о схеме. Она обычно используется такими приложениями, как GraphQL IDE и инструменты генерации документации.
+
+| Назначение | Запрос | Описание | Пример ответа |
+|------------|--------|----------|---------------|
+| **Получить все типы** | `{ __schema { types { name kind } } }` | Получает все типы в схеме с их видом (OBJECT, SCALAR, etc.) | `{ "data": { "__schema": { "types": [ { "name": "User", "kind": "OBJECT" }, { "name": "String", "kind": "SCALAR" } ] } } }` |
+| **Получить конкретный тип** | `{ __type(name: "User") { name fields { name type { name } } } }` | Получает информацию о конкретном типе и его полях | `{ "data": { "__type": { "name": "User", "fields": [ { "name": "id", "type": { "name": "ID" } }, { "name": "name", "type": { "name": "String" } } ] } } }` |
+| **Получить все queries** | `{ __schema { queryType { fields { name description args { name type { name } } } } } }` | Получает все доступные запросы и их аргументы | `{ "data": { "__schema": { "queryType": { "fields": [ { "name": "user", "description": "Get user by ID", "args": [ { "name": "id", "type": { "name": "ID" } } ] } ] } } } }` |
+| **Полуть все mutations** | `{ __schema { mutationType { fields { name description args { name type { name } } } } } }` | Получает все доступные мутации и их аргументы | `{ "data": { "__schema": { "mutationType": { "fields": [ { "name": "createUser", "description": "Create new user", "args": [ { "name": "input", "type": { "name": "UserInput" } } ] } ] } } } }` |
+| **Получить все subscriptions** | `{ __schema { subscriptionType { fields { name description } } } }` | Получает все доступные подписки | `{ "data": { "__schema": { "subscriptionType": { "fields": [ { "name": "onMessage", "description": "Subscribe to new messages" } ] } } } }` |
+| **Получить директивы** | `{ __schema { directives { name description locations } } }` | Получает все доступные директивы | `{ "data": { "__schema": { "directives": [ { "name": "deprecated", "description": "Marks field as deprecated", "locations": ["FIELD_DEFINITION"] } ] } } }` |
+| **Получить enum значения** | `{ __type(name: "UserRole") { name enumValues { name description } } }` | Получает значения enum типа | `{ "data": { "__type": { "name": "UserRole", "enumValues": [ { "name": "ADMIN", "description": "Administrator role" }, { "name": "USER", "description": "Regular user" } ] } } }` |
+| **Получить информацию о поле** | `{ __type(name: "User") { name fields { name description type { name kind ofType { name } } } } }` | Получает детальную информацию о полях типа | `{ "data": { "__type": { "name": "User", "fields": [ { "name": "posts", "description": "User's posts", "type": { "name": null, "kind": "LIST", "ofType": { "name": "Post" } } } ] } } }` |
+| **Проверить deprecated поля** | `{ __type(name: "User") { name fields { name isDeprecated deprecationReason } } }` | Находит устаревшие поля и причину устаревания | `{ "data": { "__type": { "name": "User", "fields": [ { "name": "oldField", "isDeprecated": true, "deprecationReason": "Use newField instead" } ] } } }` |
+| **Получить всю схему** | `query IntrospectionQuery { __schema { queryType { name } mutationType { name } subscriptionType { name } types { ...FullType } directives { name description locations args { ...InputValue } } } } fragment FullType on __Type { kind name description fields(includeDeprecated: true) { name description args { ...InputValue } type { ...TypeRef } isDeprecated deprecationReason } inputFields { ...InputValue } interfaces { ...TypeRef } enumValues(includeDeprecated: true) { name description isDeprecated deprecationReason } possibleTypes { ...TypeRef } } fragment InputValue on __InputValue { name description type { ...TypeRef } defaultValue } fragment TypeRef on __Type { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name } } } } }` | Полный запрос интроспекции для получения всей схемы | Полная схема GraphQL в структурированном виде |
 
 Сервисы GraphQL обычно отвечают на операции объектом JSON в запрошенной структуре.
 
@@ -618,7 +635,7 @@ PRACTITIONER
 Обход защит от перебора GraphQL
 Не решена
 
-CSRF в GraphQL
+# CSRF в GraphQL
 
 Уязвимости межсайтовой подделки запроса (CSRF) позволяют злоумышленнику побудить пользователей выполнить действия, которые они не собирались выполнять. Это делается путем создания вредоносного веб-сайта, который подделывает межсайтовый запрос к уязвимому приложению.
 Дополнительная информация
