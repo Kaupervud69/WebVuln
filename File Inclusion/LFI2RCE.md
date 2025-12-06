@@ -10,6 +10,7 @@
 * [LFI в RCE через phpinfo()](#LFI-в-RCE-через-phpinfo)
 * [LFI в RCE через контролируемый лог-файл](#LFI-в-RCE-через-контролируемый-лог-файл) 
     * [Методы внедрения кода в логи](#Методы-внедрения-кода-в-логи)
+    * [RCE через FTP](#RCE-через-FTP)
     * [RCE через SSH](#RCE-через-SSH)
     * [RCE через почту](#RCE-через-почту)
     * [RCE через логи Apache](#RCE-через-логи-Apache)
@@ -180,7 +181,7 @@ curl "http://target.com/<?php system(\$_GET['cmd']); ?>"
 ### RCE через FTP
 
 * 21 порт 
-* [Проверить логи]()
+* [Проверить логи](https://github.com/Kaupervud69/WebVuln/blob/main/File%20Inclusion/Intruder/Seclist_FTP_logfile.txt)
 * проверить восзможность выполнения команд например ```<?php echo `whoami`;?>```
 
 ### RCE через SSH
