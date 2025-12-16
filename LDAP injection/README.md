@@ -162,7 +162,7 @@ for i in range(50):
             break
 ```
 
-Скрипт для эксплуатации от [@noraj](https://github.com/noraj)
+* Скрипт для эксплуатации от [@noraj](https://github.com/noraj)
 
 ```ruby
 #!/usr/bin/env ruby
@@ -182,6 +182,8 @@ flag = ''
   end
 end
 ```
+
+
 
 
 
