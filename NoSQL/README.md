@@ -188,6 +188,7 @@ username[$ne]=toto&password[$regex]=md.*
 ```
 Это проверяет первое поле данных в объекте пользователя и возвращает первый символ имени поля. Это позволяет извлечь имя поля посимвольно.
 
+* [Exploit](https://github.com/Kaupervud69/WebVuln/blob/main/NoSQL/Intruder/exploit_search_unkown_fields.sh) для автоматизации перебора имен полей и их значений
 
 # Обход WAF и фильтров
 
