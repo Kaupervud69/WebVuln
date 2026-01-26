@@ -39,7 +39,7 @@ scope=https://oauth-authorization-server.com/auth/scopes/user/contacts.readonly
 ```
 
 ## Тип предоставления кода авторизации
-* [Запрос авторизации](#1Запрос-авторизации)
+* [Запрос авторизации](#1-Запрос-авторизации)
 * [](#)
 * [](#)
 * [](#)
@@ -48,7 +48,7 @@ scope=https://oauth-authorization-server.com/auth/scopes/user/contacts.readonly
 * [](#)
 ![Тип предоставления кода авторизации](https://github.com/Kaupervud69/WebVuln/blob/main/OAuth/jpeg/oauth-authorization-code-flow.jpg "authcode")
 
-### 1.**Запрос авторизации**
+### 1. **Запрос авторизации**
 
 Клиентское приложение отправляет запрос в конечную точку /authorization службы OAuth, запрашивая разрешение на доступ к определенным данным пользователя. 
 ```
