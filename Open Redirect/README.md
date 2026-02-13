@@ -24,7 +24,7 @@ https://example.com/redirect?url=https://userpreferredsite.com
 
 ## Коды состояния HTTP-перенаправления
 
-Коды состояния HTTP-перенаправления, начинающиеся с 3, указывают на то, что клиент должен выполнить дополнительное действие для завершения запроса. Вот некоторые из наиболее распространенных:
+Коды состояния HTTP-перенаправления, начинающиеся с `3`, указывают на то, что клиент должен выполнить дополнительное действие для завершения запроса. Вот некоторые из наиболее распространенных:
 
 *   [300 Multiple Choices](https://httpstatuses.com/300) — Указывает, что на запрос существует более одного возможного ответа. Клиент должен выбрать один из них.
 *   [301 Moved Permanently](https://httpstatuses.com/301) — Означает, что запрошенный ресурс был окончательно перемещен по URL, указанному в заголовках `Location`. Все будущие запросы должны использовать новый URI.
@@ -143,6 +143,7 @@ http://a.com／X.b.com
 * [Unvalidated Redirects and Forwards Cheat Sheet - OWASP - February 28, 2024](https://www.owasp.org/index.php/Unvalidated_Redirects_and_Forwards_Cheat_Sheet)
 * [Host/Split Exploitable Antipatterns in Unicode Normalization - Jonathan Birch - August 3, 2019](https://i.blackhat.com/USA-19/Thursday/us-19-Birch-HostSplit-Exploitable-Antipatterns-In-Unicode-Normalization.pdf)
 * [Open Redirect Cheat Sheet - PentesterLand - November 2, 2018](https://pentester.land/cheatsheets/2018/11/02/open-redirect-cheatsheet.html)
+
 
 
 
