@@ -24,7 +24,7 @@
 
 # Инструменты
 
-* [wireghoul/dotdotpwn](https://github.com/wireghoul/dotdotpwn) - Фаззер для поиска уязвимостей обхода директорий.
+* [wireghoul/dotdotpwn](https://github.com/wireghoul/dotdotpwn) - для поиска уязвимостей обхода директорий.
 
 ```python
 perl dotdotpwn.pl -h 10.10.10.10 -m ftp -t 300 -f /etc/shadow -s -q -b
