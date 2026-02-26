@@ -164,7 +164,7 @@ https://www.apple.com/shop/buy-watch/apple-watch?a[constructor][prototype]=image
 *   **Обход на стороне клиента:** [Prototype pollution – and bypassing client-side HTML sanitizers](https://research.securitum.com/prototype-pollution-and-bypassing-client-side-html-sanitizers/)
 *   **Отказ в обслуживании (Denial of Service)**
 
-# Полезные нагрузки для загрязнения прототипа
+# НагрузОчка
 
 ```python
 Object.__proto__["evilProperty"]="evilPayload"
