@@ -180,7 +180,7 @@ __proto__.baaebfc = baaebfc
 ?__proto__[test]=test
 ```
 
-# Гаджеты для загрязнения прототипа
+# Гаджеты для PP
 
 **"Гаджет"** в контексте уязвимостей обычно относится к фрагменту кода или функциональности, которые могут быть использованы во время атаки. Когда мы говорим о **"гаджете для загрязнения прототипа"**, мы имеем в виду конкретный путь выполнения кода, функцию или возможность приложения, которые восприимчивы к атаке через загрязнение прототипа или могут быть использованы через нее.
 
@@ -206,6 +206,78 @@ __proto__.baaebfc = baaebfc
 8.  Разверните трассировку стека и используйте предоставленную ссылку, чтобы перейти к строке кода, где происходит чтение свойства.
 9.  Используя элементы управления отладчика браузера, пройдите по шагам выполнения, чтобы увидеть, передается ли свойство в синк, такой как `innerHTML` или `eval()`.
 10. Повторите этот процесс для любых свойств, которые, по вашему мнению, являются потенциальными гаджетами.
+
+# CSPP через браузерные API
+
+* **PP через fetch()**
+
+Fetch API - простой способ для разработчиков инициировать HTTP-запросы с использованием JavaScript. Метод `fetch()` принимает два аргумента:
+
+*   `URL`, на который вы хотите отправить запрос.
+*   `Объект параметров (options)`, который позволяет вам контролировать части запроса, такие как метод, заголовки, параметры тела и так далее.
+
+```javascript
+fetch('https://normal-website.com/my-account/change-email', {
+    method: 'POST',
+    body: 'user=carlos&email=carlos%40ginandjuice.shop'
+})
+```
+
+Явно определили свойства `method` и `body`, но есть ряд других возможных свойств, которые оставили неопределенными. 
+
+```javascript
+fetch('/my-products.json',{method:"GET"})
+    .then((response) => response.json())
+    .then((data) => {
+        let username = data['x-username'];
+        let message = document.querySelector('.message');
+        if(username) {
+            message.innerHTML = `My products. Logged in as <b>${username}</b>`;
+        }
+        let productList = document.querySelector('ul.products');
+        for(let product of data) {
+            let product = document.createElement('li');
+            product.append(product.name);
+            productList.append(product);
+        }
+    })
+    .catch(console.error);
+```
+
+Чтобы использовать, загрязнить `Object.prototype` свойством `headers`, содержащим вредоносный заголовок `x-username`, следующим образом:
+
+```javascript
+?__proto__[headers][x-username]=<img/src/onerror=alert(1)>
+```
+
+* **Примечание**
+* Эту технику можно использовать для управления любыми неопределенными свойствами объекта параметров, переданного в `fetch()`. 
+__________________________
+
+* **PP через Object.defineProperty()**
+`Object.defineProperty()` - позволяет установить неконфигурируемое, неизменяемое свойство непосредственно на затронутом объекте следующим образом:
+
+```javascript
+Object.defineProperty(vulnerableObject, 'gadgetProperty', {
+    configurable: false,
+    writable: false
+})
+```
+
+`Object.defineProperty()` принимает объект параметров, известный как "descriptor".
+
+В этом случае атакующий может обойти эту защиту, загрязнив `Object.prototype` вредоносным свойством `value`. Если это свойство будет унаследовано объектом-дескриптором, переданным в `Object.defineProperty()`, контролируемое атакующим значение в конечном итоге может быть присвоено свойству гаджета.
+
+# Server-side prototype pollution
+
+
+
+
+
+
+
+
+
 
 
 * [](https://portswigger.net/research/server-side-prototype-pollution)
