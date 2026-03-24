@@ -133,6 +133,7 @@ UTF-8 символ 嘊 содержит `0a` в последней части с
 
 # URL
 
+* [crlf injection](https://www.invicti.com/learn/crlf-injection)
 * [CRLF Injection - CWE-93 - OWASP - May 20, 2022](https://www.owasp.org/index.php/CRLF_Injection)
 * [CRLF injection on Twitter or why blacklists fail - XSS Jigsaw - April 21, 2015](https://web.archive.org/web/20150425024348/https://blog.innerht.ml/twitter-crlf-injection/)
 * [Starbucks: [newscdn.starbucks.com] CRLF Injection, XSS - Bobrov - December 20, 2016](https://vulners.com/hackerone/H1:192749)
