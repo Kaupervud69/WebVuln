@@ -47,7 +47,9 @@
 *   [IvanGoncharov/graphql-voyager](https://github.com/IvanGoncharov/graphql-voyager) - Представляет любой GraphQL API в виде интерактивного графа.
 *   [Insomnia](https://insomnia.rest/) - Кроссплатформенный HTTP и GraphQL клиент.
 *   [Graphql visualizer](http://nathanrandal.com/graphql-visualizer/) - Это онлайн-инструмент, который берет результаты запроса интроспекции и создает визуальное представление возвращенных данных, включая отношения между операциями и типами.
-
+*   [Convert graph-json](https://datafetcher.com/graphql-json-body-converter)  - конвентировать Graph to Json
+*   [Convert json-graph](https://transform.tools/json-to-graphql) - конвентировать Json to Graph
+  
 # Немного базы
 
 > Все операции GraphQL используют одну и ту же конечную точку (endpoint) и обычно отправляются как POST-запрос. Это существенно отличается от REST API, которые используют специфичные для операции конечные точки и различные HTTP-методы. В GraphQL тип и имя операции определяют, как обрабатывается запрос, а не конечная точка, на которую он отправлен, или используемый HTTP-метод.
