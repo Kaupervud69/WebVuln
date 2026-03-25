@@ -277,4 +277,5 @@ echo "Upload wiener.jpg as avatar\n";
 
 # URL
 
-* https://portswigger.net/research/top-10-web-hacking-techniques-of-2018#6
+* [PortSwigger](https://portswigger.net/research/top-10-web-hacking-techniques-of-2018#6)
+* [Manual PHP serialization](https://www.php.net/manual/en/function.unserialize.php)
