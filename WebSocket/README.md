@@ -107,7 +107,7 @@ sqlmap -u http://127.0.0.1:8000/?fuzz=test --tables --tamper=base64encode --dump
 
 Клиент отправляет специально сформированный HTTP-запрос с заголовками, указывающими на желание переключиться на протокол WebSocket:
 
-```
+```python
 GET /chat HTTP/1.1
 Host: example.com:80
 Upgrade: websocket
@@ -118,7 +118,7 @@ Sec-WebSocket-Version: 13
 
 Сервер отвечает статусом **HTTP 101 Switching Protocols**, если он принимает запрос:
 
-```
+```python
 HTTP/1.1 101 Switching Protocols
 Upgrade: websocket
 Connection: Upgrade
@@ -146,7 +146,7 @@ Socket.IO — это библиотека JavaScript (как для клиент
 
 * Содержимое сообщения передается через `WebSockets` другому пользователю чата и отображается в браузере пользователя следующим образом:
 
-```<td>Привет, Карлос</td>```
+```<td>Привет, Кто-то</td>```
 
 При условии отсутствия какой-либо другой обработки ввода или защиты, можно выполнить атаку XSS.
 ```{"message":"<img src=1 onerror='alert(1)'>"}```
