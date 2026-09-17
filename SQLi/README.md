@@ -11,29 +11,29 @@
 	* [Инъекции Cassandra](https://github.com/Kaupervud69/WebVuln/blob/main/SQLi/Cassandra%20Injection.md)
 	* [Инъекции DB2](https://github.com/Kaupervud69/WebVuln/blob/main/SQLi/DB2%20Injection.md)
 	* [SQLmap](https://github.com/Kaupervud69/WebVuln/blob/main/SQLi/SQLmap.md)
-* Инструменты
-* Обнаружение точки входа
-* Идентификация СУБД
-* Обход аутентификации
-	* Необработанные MD5 и SHA1
-* Инъекции на основе UNION
-* Инъекции на основе ошибок
-* Слепые инъекции
-	* Инъекции на основе булевых значений
-	* Слепые инъекции на основе ошибок
-	* Инъекции на основе времени
-	* Внеполосные (OAST)
-* Инъекции на основе стека
-* Полиглотные инъекции
-* Маршрутизированные инъекции
-* SQL-инъекции второго порядка
-* Подготовленные выражения PDO
-* Общий обход WAF
-	* Пробелы запрещены
-	* Запятые запрещены
-	* Равенство запрещено
-	* Изменение регистра
-* Ссылки
+* [Инструменты](#Инструменты)
+* [Обнаружение точки входа](#Обнаружение-точки-входа)
+* [Идентификация СУБД](#Идентификация-СУБД)
+* [Обход аутентификации](#Обход-аутентификации)
+	* [Необработанные MD5 и SHA1](#Необработанные-MD5-и-SHA1)
+* [Инъекции на основе UNION](#Инъекции-на-основе-UNION)
+* [Инъекции на основе ошибок](#Инъекции-на-основе-ошибок)
+* [Слепые инъекции](#Слепые-инъекции)
+	* [Инъекции на основе булевых значений](#Инъекции-на-основе-булевых-значений)
+	* [Слепые инъекции на основе ошибок](#Слепые-инъекции-на-основе-ошибок)
+	* [Инъекции на основе времени](#Инъекции-на-основе-времени)
+	* [Внеполосные (OAST)](#Внеполосные-OAST)
+* [Инъекции на основе стека](#Инъекции-на-основе-стека)
+* [Полиглотные инъекции](#Полиглотные-инъекции)
+* [Маршрутизированные инъекции](#Маршрутизированные-инъекции)
+* [SQL-инъекции второго порядка](#SQL-инъекции-второго-порядка)
+* [Подготовленные выражения PDO](#Подготовленные-выражения-PDO)
+* [Общий обход WAF](#Общий-обход-WAF)
+	* [Пробелы запрещены](#Пробелы-запрещены)
+	* [Запятые запрещены](#Запятые-запрещены)
+	* [Равенство запрещено](#Равенство-запрещено)
+	* [Изменение регистра](#Изменение-регистра)
+* [Ссылки](#Ссылки)
 
 # Инструменты
 
@@ -514,3 +514,8 @@ SELECT `\'x` FROM (SELECT table_name AS `\'x` from information_schema.tables)y;#
 
 
 # Ссылки
+
+* [A Novel Technique for SQL Injection in PDO's Prepared Statements - Adam Kues - July 21, 2025](https://web.archive.org/web/20251017002820/https://slcyber.io/assetnote-security-research-center/a-novel-technique-for-sql-injection-in-pdos-prepared-statements/)
+* [Implement a Blind Error-Based SQLMap payload for SQLite - soka - August 24, 2023](https://web.archive.org/web/20250513112724/https://sokarepo.github.io/web/2023/08/24/implement-blind-sqlite-sqlmap.html)
+* [SQLi Cheatsheet - NetSparker - March 19, 2022](https://web.archive.org/web/20220219223426/https://www.netsparker.com/blog/web-security/sql-injection-cheat-sheet/)
+* [Analyzing CVE-2018-6376 – Joomla!, Second Order SQL Injection - Not So Secure - February 9, 2018](https://web.archive.org/web/20180209143119/https://www.notsosecure.com/analyzing-cve-2018-6376/)
